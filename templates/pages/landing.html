@@ -27,8 +27,8 @@
             </ul>
         </div>
         <div class="d-none d-lg-flex gap-4 align-items-center">
-            <a href="#" class="text-decoration-none text-secondary fw-medium hover-primary">Log In</a>
-            <a href="#" class="btn btn-primary-custom">Register</a>
+            <a href="{% url 'accounts:login' %}" class="text-decoration-none text-secondary fw-medium hover-primary">Log In</a>
+            <a href="{% url 'accounts:register' %}" class="btn btn-primary-custom">Register</a>
         </div>
     </div>
 </nav>
@@ -47,7 +47,7 @@
                 <p class="text-secondary mb-5 fs-6" style="line-height: 1.7; max-width: 95%;">
                     The first intuitive portfolio builder tailored exclusively for educators and researchers. Input simple bullet points about your research and teaching, and let our AI engine generate eloquent biographies, structure your publications, and publish a modern web presence in seconds.
                 </p>
-                <a href="#" class="btn btn-primary-custom btn-lg shadow-sm fs-6 px-4 py-3">
+                <a href="{% url 'accounts:register' %}" class="btn btn-primary-custom btn-lg shadow-sm fs-6 px-4 py-3">
                     Create Your Smart Site Now <i class="bi bi-stars ms-2"></i>
                 </a>
             </div>
