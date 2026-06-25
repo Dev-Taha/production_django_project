@@ -1,0 +1,12 @@
+<html>
+<body>
+    <div class="sidebar">
+        <a href="{% url 'dashboard:main_dashboard' %}">Dashboard</a>
+    </div>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>

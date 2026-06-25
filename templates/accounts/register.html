@@ -10,7 +10,7 @@
     <h2 class="fw-bold mb-2">Create your profile</h2>
     <p class="text-secondary mb-4 fs-6" style="line-height: 1.6;">Join thousands of academics and build your AI-powered web presence today.</p>
 
-    <form method="post">
+    <!-- <form method="post">
         {% csrf_token %}
         
         <div class="mb-3">
@@ -65,7 +65,89 @@
         <button type="submit" class="btn btn-primary-custom w-100 py-3 d-flex justify-content-center align-items-center gap-2 fs-6 mb-4">
             Create Free Account
         </button>
-    </form>
+    </form> -->
+    <form method="post">
+    {% csrf_token %}
+    
+    <!-- First Name + Last Name -->
+    <div class="row g-2 mb-3">
+        <div class="col-6">
+            <label class="form-label text-secondary fw-semibold small">First Name</label>
+            <div class="input-icon-wrapper">
+                <i class="bi bi-person"></i>
+                {{ reg_form.first_name }}
+            </div>
+            {% if reg_form.first_name.errors %}
+                <div class="text-danger small mt-1">{{ reg_form.first_name.errors.0 }}</div>
+            {% endif %}
+        </div>
+        <div class="col-6">
+            <label class="form-label text-secondary fw-semibold small">Last Name</label>
+            <div class="input-icon-wrapper">
+                <i class="bi bi-person"></i>
+                {{ reg_form.last_name }}
+            </div>
+            {% if reg_form.last_name.errors %}
+                <div class="text-danger small mt-1">{{ reg_form.last_name.errors.0 }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Email -->
+    <div class="mb-3">
+        <label class="form-label text-secondary fw-semibold small">Email Address</label>
+        <div class="input-icon-wrapper">
+            <i class="bi bi-at fs-5"></i>
+            {{ reg_form.email }}
+        </div>
+        {% if reg_form.email.errors %}
+            <div class="text-danger small mt-1">{{ reg_form.email.errors.0 }}</div>
+        {% endif %}
+    </div>
+
+    <!-- Password -->
+    <div class="mb-3">
+        <label class="form-label text-secondary fw-semibold small">Password</label>
+        <div class="input-icon-wrapper">
+            <i class="bi bi-lock"></i>
+            {{ reg_form.password }}
+        </div>
+        {% if reg_form.password.errors %}
+            <div class="text-danger small mt-1">{{ reg_form.password.errors.0 }}</div>
+        {% endif %}
+    </div>
+
+    <!-- Confirm Password -->
+    <div class="mb-4">
+        <label class="form-label text-secondary fw-semibold small">Confirm Password</label>
+        <div class="input-icon-wrapper">
+            <i class="bi bi-lock"></i>
+            {{ reg_form.confirm_password }}
+        </div>
+        {% if reg_form.confirm_password.errors %}
+            <div class="text-danger small mt-1">{{ reg_form.confirm_password.errors.0 }}</div>
+        {% endif %}
+    </div>
+
+    <!-- Terms -->
+    <div class="mb-4">
+        <div class="form-check d-flex align-items-center gap-2">
+            <input class="form-check-input mt-0" type="checkbox" id="termsCheck" required>
+            <label class="form-check-label text-secondary small fw-medium" for="termsCheck">
+                I agree to the <a href="#" class="text-primary-blue text-decoration-none">Terms of Service</a> and <a href="#" class="text-primary-blue text-decoration-none">Privacy Policy</a>.
+            </label>
+        </div>
+    </div>
+
+    <!-- General errors -->
+    {% if reg_form.non_field_errors %}
+        <div class="alert alert-danger small py-2">{{ reg_form.non_field_errors.0 }}</div>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary-custom w-100 py-3 fs-6 mb-4">
+        Create Free Account
+    </button>
+</form>
 
     <div class="auth-divider">
         OR REGISTER WITH

@@ -9,7 +9,7 @@
 <div class="auth-form-container mt-auto mb-auto">
     <h2 class="fw-bold mb-2">Welcome back</h2>
     <p class="text-secondary mb-4 fs-6" style="line-height: 1.6;">Enter your credentials to access your academic dashboard.</p>
-
+<!-- 
     <form method="post">
         {% csrf_token %}
         
@@ -17,7 +17,8 @@
             <label class="form-label text-secondary fw-semibold small">Email Address</label>
             <div class="input-icon-wrapper">
                 <i class="bi bi-envelope"></i>
-                <input type="email" class="form-control form-control-lg fs-6" placeholder="example@gmail.com" required>
+                
+        
             </div>
         </div>
 
@@ -42,7 +43,39 @@
         <button type="submit" class="btn btn-primary-custom w-100 py-3 d-flex justify-content-center align-items-center gap-2 fs-6">
             Log In
         </button>
-    </form>
+    </form> -->
+    <form method="post">
+    {% csrf_token %}
+    
+    <div class="mb-3">
+        <label class="form-label text-secondary fw-semibold small">Email Address</label>
+        <div class="input-icon-wrapper">
+            <i class="bi bi-envelope"></i>
+            {{ login_form.email }}
+        </div>
+        {% if login_form.email.errors %}
+            <div class="text-danger small mt-1">{{ login_form.email.errors.0 }}</div>
+        {% endif %}
+    </div>
+
+    <div class="mb-4">
+        <label class="form-label text-secondary fw-semibold small">Password</label>
+        <div class="input-icon-wrapper">
+            <i class="bi bi-lock"></i>
+            {{ login_form.password }}
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for msg in messages %}
+            <div class="alert alert-danger small py-2">{{ msg }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary-custom w-100 py-3 fs-6">
+        Log In
+    </button>
+</form>
 
     <div class="auth-divider">
         OR CONTINUE WITH

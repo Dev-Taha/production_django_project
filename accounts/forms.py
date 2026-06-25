@@ -7,14 +7,28 @@ from datetime import date
 
 class RegisterForm(forms.ModelForm):
     password = forms.CharField(
-    widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    widget=forms.PasswordInput(attrs={ 'class': 'form-control fs-6'}))
             
     confirm_password = forms.CharField(
-    widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    widget=forms.PasswordInput(attrs={'class': 'form-control fs-6'}))
             
     class Meta:
         model=User
         fields = ['first_name', 'last_name', 'email', 'password']
+        widgets = {
+            'first_name': forms.TextInput(attrs={
+                'class': 'form-control fs-6',
+                
+            }),
+            'last_name': forms.TextInput(attrs={
+                'class': 'form-control fs-6',
+                
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control fs-6',
+                
+            }),
+        }
        
 
    
@@ -58,10 +72,16 @@ class RegisterForm(forms.ModelForm):
 
 class LoginForm(forms.Form):  
     email = forms.EmailField(
-        widget=forms.EmailInput(attrs={'class': 'form-control'})
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control form-control-lg fs-6',
+            
+        })
     )
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control form-control-lg fs-6',
+           
+        })
     )
     def clean_email(self):
         typing = self.cleaned_data.get('email', '').strip()
