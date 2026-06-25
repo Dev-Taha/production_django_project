@@ -7,5 +7,310 @@
 
 
 {% block content %}
-    Landing Page
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top py-3 border-bottom">
+    <div class="container">
+        <a class="navbar-brand fs-4" href="#">
+            <i class="bi bi-layers-fill text-primary-blue"></i>
+            SmartWeb
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+            <ul class="navbar-nav gap-2">
+                <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+                <li class="nav-item"><a class="nav-link" href="#ai-tools">AI Tools</a></li>
+                <li class="nav-item"><a class="nav-link" href="#about">About Us</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contact">Contact Us</a></li>
+            </ul>
+        </div>
+        <div class="d-none d-lg-flex gap-4 align-items-center">
+            <a href="#" class="text-decoration-none text-secondary fw-medium hover-primary">Log In</a>
+            <a href="#" class="btn btn-primary-custom">Register</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-5 mb-lg-0 pe-lg-5">
+                <h1 class="display-4 fw-bold mb-4" style="line-height: 1.15; color: #1e293b;">
+                    Your Professional<br>
+                    Academic Website.<br>
+                    <span class="text-primary-blue">Crafted by AI</span>, Built<br>
+                    Without Code.
+                </h1>
+                <p class="text-secondary mb-5 fs-6" style="line-height: 1.7; max-width: 95%;">
+                    The first intuitive portfolio builder tailored exclusively for educators and researchers. Input simple bullet points about your research and teaching, and let our AI engine generate eloquent biographies, structure your publications, and publish a modern web presence in seconds.
+                </p>
+                <a href="#" class="btn btn-primary-custom btn-lg shadow-sm fs-6 px-4 py-3">
+                    Create Your Smart Site Now <i class="bi bi-stars ms-2"></i>
+                </a>
+            </div>
+            <div class="col-lg-6">
+                <!-- Mockup Image Replacement -->
+                <div class="hero-image-placeholder position-relative">
+                    <div class="d-flex align-items-center mb-3 border-bottom pb-2">
+                        <div class="rounded-circle bg-danger me-2" style="width: 12px; height: 12px;"></div>
+                        <div class="rounded-circle bg-warning me-2" style="width: 12px; height: 12px;"></div>
+                        <div class="rounded-circle bg-success" style="width: 12px; height: 12px;"></div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-4">
+                            <div class="bg-light rounded p-3 h-100 border">
+                                <div class="bg-secondary bg-opacity-25 rounded mb-3" style="height: 12px; width: 60%;"></div>
+                                <div class="bg-secondary bg-opacity-10 rounded mb-2" style="height: 8px; width: 100%;"></div>
+                                <div class="bg-secondary bg-opacity-10 rounded mb-2" style="height: 8px; width: 80%;"></div>
+                                <div class="mt-4">
+                                    <div class="bg-primary bg-opacity-10 rounded mb-3 p-3 border border-primary border-opacity-25">
+                                        <div class="bg-primary rounded mb-2" style="height: 8px; width: 40%;"></div>
+                                        <div class="bg-primary bg-opacity-25 rounded" style="height: 6px; width: 80%;"></div>
+                                    </div>
+                                    <div class="bg-white rounded mb-2 p-3 border shadow-sm">
+                                        <div class="bg-secondary bg-opacity-25 rounded mb-2" style="height: 8px; width: 40%;"></div>
+                                        <div class="bg-secondary bg-opacity-10 rounded" style="height: 6px; width: 80%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <div class="bg-white rounded p-4 h-100 border text-center shadow-sm d-flex flex-column align-items-center">
+                                <div class="rounded-circle bg-light border mb-4 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                    <i class="bi bi-person text-secondary fs-1"></i>
+                                </div>
+                                <div class="bg-secondary bg-opacity-25 rounded mb-3" style="height: 16px; width: 50%;"></div>
+                                <div class="bg-secondary bg-opacity-10 rounded mb-5" style="height: 10px; width: 30%;"></div>
+                                <div class="text-start w-100">
+                                    <div class="bg-secondary bg-opacity-10 rounded mb-3" style="height: 10px; width: 100%;"></div>
+                                    <div class="bg-secondary bg-opacity-10 rounded mb-3" style="height: 10px; width: 100%;"></div>
+                                    <div class="bg-secondary bg-opacity-10 rounded mb-3" style="height: 10px; width: 80%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-5 my-5">
+    <div class="container">
+        <div class="text-center mb-5 pb-3">
+            <h2 class="fw-bold mb-3 fs-1">Why Academic Leaders Choose SmartApp</h2>
+            <p class="text-secondary fs-5">We solve the friction between high-impact research and modern web presence.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="icon-box text-primary-blue bg-primary bg-opacity-10">
+                        <i class="bi bi-clock"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">No Time to Write?</h4>
+                    <p class="text-secondary" style="line-height: 1.6;">Focus on your research. Our AI turns fragmented notes and publication lists into a cohesive professional narrative that accurately reflects your expertise.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="icon-box text-primary-blue bg-primary bg-opacity-10">
+                        <i class="bi bi-code-slash"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Zero Tech Skills?</h4>
+                    <p class="text-secondary" style="line-height: 1.6;">If you can write an email, you can build a site. Our intuitive dashboard abstracts all the complexity of hosting, DNS, and responsive design away.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="icon-box text-primary-blue bg-primary bg-opacity-10">
+                        <i class="bi bi-tags"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Expensive Developers?</h4>
+                    <p class="text-secondary" style="line-height: 1.6;">Avoid the thousands in development fees. Get a pixel-perfect, SEO optimized site that looks like it cost a fortune, for the price of a coffee subscription.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Dark Section -->
+<section id="ai-tools" class="dark-section shadow-lg">
+    <div class="container">
+        <div class="row g-0">
+            <div class="col-lg-4 dark-col position-relative">
+                <div class="mb-4">
+                    <span class="badge bg-primary bg-opacity-25 text-info px-3 py-2 rounded-pill border border-info border-opacity-25 d-inline-flex align-items-center gap-1 mb-4" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                        THE AI ADVANTAGE
+                    </span>
+                </div>
+                <i class="bi bi-lightbulb fs-2 text-white mb-4 d-block opacity-75"></i>
+                <h4 class="fw-bold mb-3">AI Bio Generator</h4>
+                <p class="text-white-50" style="line-height: 1.7; font-size: 0.95rem;">Our engine parses your CV and research interests to draft multiple biography versions tailored for different audiences—from peer reviewers to prospective students.</p>
+            </div>
+            <div class="col-lg-4 dark-col">
+                <i class="bi bi-journal-text fs-2 text-white mb-4 d-block opacity-75" style="margin-top: 4.5rem;"></i>
+                <h4 class="fw-bold mb-3">AI Publications Manager</h4>
+                <p class="text-white-50" style="line-height: 1.7; font-size: 0.95rem;">Simply upload a BibTeX or list of DOIs. Our AI categorizes your work by impact, theme, or year, automatically adding metadata and links.</p>
+            </div>
+            <div class="col-lg-4 dark-col">
+                <i class="bi bi-diagram-3 fs-2 text-white mb-4 d-block opacity-75" style="margin-top: 4.5rem;"></i>
+                <h4 class="fw-bold mb-3">Interactive Course Hub</h4>
+                <p class="text-white-50" style="line-height: 1.7; font-size: 0.95rem;">Turn static syllabi into dynamic learning environments. AI organizes your modules and provides students with an intuitive navigation experience.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Empowering Section -->
+<section id="about" class="empowering-section">
+    <div class="container">
+        <div class="text-center mb-5 pb-4" style="max-width: 800px; margin: 0 auto;">
+            <h2 class="fw-bold mb-4 fs-1">Empowering Academic Voices</h2>
+            <p class="text-secondary fs-5" style="line-height: 1.8;">
+                Founded by a collective of tech innovators and veteran academics, SmartApp was born from a simple mission: to eliminate the technical barriers between groundbreaking research and global visibility. We believe your work deserves a digital stage as sophisticated as the insights you produce.
+            </p>
+        </div>
+        <div class="row mt-5 text-center g-4">
+            <div class="col-md-4">
+                <div class="circle-icon bg-primary bg-opacity-10 text-primary-blue">
+                    <i class="bi bi-lightbulb"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Innovation</h4>
+                <p class="text-secondary px-3" style="line-height: 1.6;">Pioneering AI-driven tools specifically calibrated for academic terminology and research hierarchies.</p>
+            </div>
+            <div class="col-md-4">
+                <div class="circle-icon bg-primary bg-opacity-10 text-primary-blue">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Academic Integrity</h4>
+                <p class="text-secondary px-3" style="line-height: 1.6;">Ensuring accuracy and professional ethics in every AI-generated narrative and data visualization.</p>
+            </div>
+            <div class="col-md-4">
+                <div class="circle-icon bg-primary bg-opacity-10 text-primary-blue">
+                    <i class="bi bi-person-accessibility"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Accessibility</h4>
+                <p class="text-secondary px-3" style="line-height: 1.6;">Making high-end web design accessible to every researcher, regardless of their technical background.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="contact-section">
+    <div class="container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-5 pe-lg-5">
+                <h2 class="fw-bold mb-4 fs-1">Get in Touch</h2>
+                <p class="text-secondary mb-5 fs-5" style="line-height: 1.6;">Our academic support team is ready to help you build your digital legacy. Reach out for technical help, enterprise inquiries, or research lab solutions.</p>
+                
+                <div class="d-flex mb-4 align-items-center">
+                    <div class="me-4">
+                        <div class="icon-box bg-white border shadow-sm text-primary-blue mb-0 rounded-circle" style="width: 3rem; height: 3rem; font-size: 1.25rem;">
+                            <i class="bi bi-envelope"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h6 class="mb-1 text-secondary text-uppercase fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">Email Us</h6>
+                        <p class="mb-0 fw-medium text-dark">support@smartapp.edu</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex mb-4 align-items-center">
+                    <div class="me-4">
+                        <div class="icon-box bg-white border shadow-sm text-primary-blue mb-0 rounded-circle" style="width: 3rem; height: 3rem; font-size: 1.25rem;">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h6 class="mb-1 text-secondary text-uppercase fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">Campus Hub</h6>
+                        <p class="mb-0 fw-medium text-dark">Academic Plaza, Innovation Row, Suite 402</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-center">
+                    <div class="me-4">
+                        <div class="icon-box bg-white border shadow-sm text-primary-blue mb-0 rounded-circle" style="width: 3rem; height: 3rem; font-size: 1.25rem;">
+                            <i class="bi bi-lightning-charge"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h6 class="mb-1 text-secondary text-uppercase fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">Response Time</h6>
+                        <p class="mb-0 fw-medium text-dark">Typically within 24 hours</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-7">
+                <div class="contact-card">
+                    <form>
+                        <div class="mb-4">
+                            <label class="form-label text-secondary fw-semibold small">Your Name</label>
+                            <input type="text" class="form-control form-control-lg fs-6" placeholder="Prof. Jane Doe">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-secondary fw-semibold small">Your Academic Email</label>
+                            <input type="email" class="form-control form-control-lg fs-6" placeholder="jane.doe@university.edu">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-secondary fw-semibold small">Message</label>
+                            <textarea class="form-control form-control-lg fs-6" rows="4" placeholder="How can we help your research group?"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary-custom w-100 py-3 d-flex justify-content-center align-items-center gap-2 fs-6">
+                            Send Message <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="row g-4 mb-5">
+            <div class="col-lg-4 pe-lg-5">
+                <a class="navbar-brand mb-3 d-inline-flex align-items-center" href="#">
+                    <i class="bi bi-layers-fill text-primary-blue fs-3"></i>
+                    <span class="fs-4 ms-2 text-dark fw-bold">SmartApp</span>
+                </a>
+                <p class="text-secondary mt-2" style="font-size: 0.95rem; line-height: 1.6;">Empowering academics with beautiful, AI-driven professional websites.</p>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <h6 class="fw-bold mb-4 text-dark">Ecosystem</h6>
+                <a href="#" class="footer-link">Templates</a>
+                <a href="#" class="footer-link">Showcase</a>
+                <a href="#" class="footer-link">API Docs</a>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <h6 class="fw-bold mb-4 text-dark">Support</h6>
+                <a href="#" class="footer-link">Office Hours</a>
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+            </div>
+            <div class="col-lg-4 col-md-4">
+                <h6 class="fw-bold mb-4 text-dark">Contact</h6>
+                <a href="mailto:support@smartapp.edu" class="footer-link mb-4">support@smartapp.edu</a>
+                <div class="d-flex gap-3 mt-4">
+                    <a href="#" class="text-secondary text-decoration-none" style="transition: color 0.2s;"><i class="bi bi-globe fs-4"></i></a>
+                    <a href="#" class="text-secondary text-decoration-none" style="transition: color 0.2s;"><i class="bi bi-twitter-x fs-4"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center pt-4 border-top">
+            <p class="text-secondary small mb-0">© 2024 SmartApp Inc. Built for high-performance teams.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Floating Action Button -->
+<div class="floating-chat">
+    <i class="bi bi-chat-dots-fill"></i>
+</div>
+
 {% endblock content %}
