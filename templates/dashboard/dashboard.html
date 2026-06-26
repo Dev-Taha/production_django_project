@@ -1,7 +1,168 @@
-{% extends 'dashboard/base_dashboard.html' %}
+{% extends "dashboard/base_dashboard.html" %}
 
-{% block content %}
-    <h1>Welcome back, {{ user.name }}!</h1> <a href="{% url 'accounts:logout' %}" class="btn btn-danger">
-        Logout
+{% block title %}SmartWeb - Dashboard{% endblock title %}
+
+{% block nav_dashboard %}active{% endblock %}
+
+{% block dashboard_content %}
+
+<!-- Welcome Banner -->
+<div class="dashboard-card d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4 p-4">
+    <div>
+        <h2 class="fw-bold mb-1" style="font-size: 1.9rem;">Welcome back, Dr. Ahmed</h2>
+        <p class="text-secondary mb-0">Your academic portfolio is live and optimized.</p>
+    </div>
+    <a href="#" class="btn btn-primary-custom d-flex align-items-center gap-2 px-4 py-2">
+        <i class="bi bi-plus-circle"></i> Create Portfolio
     </a>
-{% endblock %}
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+
+    <!-- Publications -->
+    <div class="col-md-4">
+        <div class="dashboard-card stat-card p-4">
+            <div class="mb-3">
+                <div class="stat-icon bg-primary bg-opacity-10 text-primary-blue">
+                    <i class="bi bi-file-earmark-text"></i>
+                </div>
+            </div>
+            <div class="text-secondary small mb-1">Publications</div>
+            <div class="stat-value">18 Papers</div>
+            <div class="d-flex gap-1 mt-2">
+                <span class="pub-badge">PDI</span>
+                <span class="pub-badge">IEEE</span>
+                <span class="pub-badge">ACL</span>
+                <span class="pub-badge pub-badge-more">+15</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Courses -->
+    <div class="col-md-4">
+        <div class="dashboard-card stat-card p-4">
+            <div class="mb-3">
+                <div class="stat-icon bg-primary bg-opacity-10 text-primary-blue">
+                    <i class="bi bi-mortarboard"></i>
+                </div>
+            </div>
+            <div class="text-secondary small mb-1">Courses</div>
+            <div class="stat-value">4 Active</div>
+            <div class="text-secondary mt-1" style="font-size: 0.78rem;">Fall Semester 2024</div>
+        </div>
+    </div>
+
+    <!-- Profile Traffic -->
+    <div class="col-md-4">
+        <div class="dashboard-card stat-card p-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="stat-icon bg-primary bg-opacity-10 text-primary-blue">
+                    <i class="bi bi-eye"></i>
+                </div>
+                <span class="stat-badge text-success"><i class="bi bi-graph-up-arrow"></i> +12%</span>
+            </div>
+            <div class="text-secondary small mb-1">Profile Traffic</div>
+            <div class="stat-value">1,240</div>
+            <!-- Mini bar chart -->
+            <div class="d-flex align-items-end gap-1 mt-2" style="height: 28px;">
+                <div class="bg-secondary bg-opacity-25 rounded-1 flex-fill" style="height: 40%;"></div>
+                <div class="bg-secondary bg-opacity-25 rounded-1 flex-fill" style="height: 55%;"></div>
+                <div class="bg-secondary bg-opacity-25 rounded-1 flex-fill" style="height: 45%;"></div>
+                <div class="bg-secondary bg-opacity-25 rounded-1 flex-fill" style="height: 70%;"></div>
+                <div class="bg-secondary bg-opacity-25 rounded-1 flex-fill" style="height: 60%;"></div>
+                <div class="bg-primary bg-opacity-50 rounded-1 flex-fill" style="height: 85%;"></div>
+                <div class="bg-primary-blue rounded-1 flex-fill" style="height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Portfolio Assets Table -->
+<div class="dashboard-card p-4">
+
+    <!-- Table Header -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <div class="d-flex align-items-center gap-2">
+            <span class="fw-semibold">Portfolio Assets</span>
+            <span class="portfolio-live-badge"><span class="live-dot"></span> Live</span>
+        </div>
+        <div class="topbar-search" style="max-width: 220px;">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Filter assets..." class="topbar-search-input">
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+        <table class="table dashboard-table mb-3">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Last Mod.</th>
+                    <th>Content Type</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="asset-icon text-primary-blue bg-primary bg-opacity-10"><i class="bi bi-file-earmark-text"></i></span>
+                            AI Ethics in Research
+                        </div>
+                    </td>
+                    <td class="text-secondary">2 hours ago</td>
+                    <td><span class="asset-type-badge">PUBLICATION</span></td>
+                    <td class="text-end"><button class="portfolio-action-btn border-0 bg-transparent"><i class="bi bi-three-dots-vertical text-secondary"></i></button></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="asset-icon text-primary-blue bg-primary bg-opacity-10"><i class="bi bi-mortarboard"></i></span>
+                            Advanced Robotics 101
+                        </div>
+                    </td>
+                    <td class="text-secondary">Yesterday</td>
+                    <td><span class="asset-type-badge asset-type-badge--course">COURSE</span></td>
+                    <td class="text-end"><button class="portfolio-action-btn border-0 bg-transparent"><i class="bi bi-three-dots-vertical text-secondary"></i></button></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="asset-icon text-primary-blue bg-primary bg-opacity-10"><i class="bi bi-file-earmark-text"></i></span>
+                            Neural Networks for Healthcare
+                        </div>
+                    </td>
+                    <td class="text-secondary">3 days ago</td>
+                    <td><span class="asset-type-badge">PUBLICATION</span></td>
+                    <td class="text-end"><button class="portfolio-action-btn border-0 bg-transparent"><i class="bi bi-three-dots-vertical text-secondary"></i></button></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="asset-icon text-primary-blue bg-primary bg-opacity-10"><i class="bi bi-mortarboard"></i></span>
+                            Machine Learning Fundamentals
+                        </div>
+                    </td>
+                    <td class="text-secondary">May 12</td>
+                    <td><span class="asset-type-badge asset-type-badge--course">COURSE</span></td>
+                    <td class="text-end"><button class="portfolio-action-btn border-0 bg-transparent"><i class="bi bi-three-dots-vertical text-secondary"></i></button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Table Footer Actions -->
+    <div class="d-flex gap-2">
+        <a href="#" class="btn btn-primary-custom d-flex align-items-center gap-2 px-4">
+            <i class="bi bi-plus-lg"></i> Add Publication
+        </a>
+        <a href="#" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-4">
+            <i class="bi bi-eye"></i> Preview
+        </a>
+    </div>
+</div>
+
+{% endblock dashboard_content %}
