@@ -1,12 +1,10 @@
-<html>
-<body>
-    <div class="sidebar">
-        <a href="{% url 'dashboard:main_dashboard' %}">Dashboard</a>
-    </div>
+{% extends "base.html" %}
 
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
-</body>
-</html>
+{% block title %}
+    SmartWeb - Dashboard
+{% endblock title %}
+
+
+{% block content %}
+    
+{% endblock content %}
