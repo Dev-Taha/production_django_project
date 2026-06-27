@@ -28,15 +28,15 @@
 
         <!-- Navigation -->
         <nav class="sidebar-nav">
-            <a href="#" class="sidebar-link {% block nav_dashboard %}{% endblock %}">
+            <a href="{% url 'dashboard:main_dashboard' %}" class="sidebar-link {% block nav_dashboard %}{% endblock %}">
                 <i class="bi bi-grid-1x2"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="#" class="sidebar-link {% block nav_templates %}{% endblock %}">
+            <a href="{% url 'dashboard:templates_dashboard' %}" class="sidebar-link {% block nav_templates %}{% endblock %}">
                 <i class="bi bi-journal-text"></i>
                 <span>Templates</span>
             </a>
-            <a href="#" class="sidebar-link {% block nav_settings %}{% endblock %}">
+            <a href="{% url 'dashboard:setting_dashboard' %}" class="sidebar-link {% block nav_settings %}{% endblock %}">
                 <i class="bi bi-gear"></i>
                 <span>Settings</span>
             </a>
@@ -70,9 +70,9 @@
                     <i class="bi bi-bell"></i>
                     <span class="topbar-bell-dot"></span>
                 </button>
-                <button class="topbar-bell ms-1">
+                <a href="{% url 'dashboard:setting_dashboard' %}" class="topbar-bell ms-1 d-inline-flex align-items-center justify-content-center text-decoration-none">
                     <i class="bi bi-gear"></i>
-                </button>
+                </a>
             </div>
         </header>
 
