@@ -12,7 +12,7 @@ from django.views import View
 from django.conf import settings
 
 def login(request):
-  
+
     if 'user_id' in request.session: 
         return redirect('dashboard:main_dashboard')
     context = {'login_form': LoginForm()}
@@ -64,8 +64,7 @@ def register(request):
 
 def logout(request):
     request.session.clear()
-    messages.info(request, "You have been logged out successfully.")
-    return redirect('accounts:login')
+    return redirect('accounts:login') 
 
 
 class GoogleLoginView(View):
