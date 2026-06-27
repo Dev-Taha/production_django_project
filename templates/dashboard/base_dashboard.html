@@ -1,10 +1,103 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}
-    SmartWeb - Dashboard
-{% endblock title %}
-
+{% block title %}SmartWeb - Dashboard{% endblock title %}
 
 {% block content %}
-    
+<div class="dashboard-wrapper">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="dashboard-sidebar">
+
+        <!-- Brand -->
+        <div class="sidebar-brand">
+            <img src="{% static 'img/icon.png' %}" alt="SmartWeb Logo">
+            <div>
+                <div class="sidebar-brand-name">SmartWeb</div>
+            </div>
+        </div>
+
+        <!-- User Profile -->
+        <div class="sidebar-user">
+            <img src="https://i.pravatar.cc/150?img=12" alt="User Avatar" class="sidebar-avatar">
+            <div>
+                <div class="sidebar-user-name">Prof. Dr. Ahmed</div>
+                <div class="sidebar-user-dept">Computer Science</div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+            <a href="#" class="sidebar-link {% block nav_dashboard %}{% endblock %}">
+                <i class="bi bi-grid-1x2"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="sidebar-link {% block nav_templates %}{% endblock %}">
+                <i class="bi bi-journal-text"></i>
+                <span>Templates</span>
+            </a>
+            <a href="#" class="sidebar-link {% block nav_settings %}{% endblock %}">
+                <i class="bi bi-gear"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <!-- Footer links -->
+        <div class="sidebar-footer mt-auto">
+            <a href="#" class="sidebar-footer-link">
+                <i class="bi bi-question-circle"></i>
+                <span>Help Center</span>
+            </a>
+            <a href="{% url 'accounts:logout' %}" class="sidebar-footer-link text-danger-soft">
+                <i class="bi bi-box-arrow-left"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="dashboard-main">
+
+        <!-- Top Bar -->
+        <header class="dashboard-topbar">
+            <div class="topbar-search">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Search publications, tools, or papers..." class="topbar-search-input">
+            </div>
+            <div class="topbar-actions">
+                <button class="topbar-bell">
+                    <i class="bi bi-bell"></i>
+                    <span class="topbar-bell-dot"></span>
+                </button>
+                <button class="topbar-bell ms-1">
+                    <i class="bi bi-gear"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Page-specific content -->
+        <div class="dashboard-body">
+            {% if messages %}
+            <div class="position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+                {% for message in messages %}
+                <div class="toast align-items-center border-0 show mb-2 {% if message.tags == 'success' %}bg-success{% else %}bg-danger{% endif %} text-white" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body fw-medium">
+                            <i class="bi {% if message.tags == 'success' %}bi-check-circle{% else %}bi-exclamation-triangle{% endif %} me-2"></i>
+                            {{ message }}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block dashboard_content %}
+            {% endblock dashboard_content %}
+        </div>
+
+    </div>
+</div>
 {% endblock content %}

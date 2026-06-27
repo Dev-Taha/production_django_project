@@ -59,7 +59,6 @@ def register(request):
 
 def logout(request):
     request.session.clear()
-    messages.info(request, "You have been logged out successfully.")
     return redirect('accounts:login') 
 
 
