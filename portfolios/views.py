@@ -22,7 +22,7 @@ def light_template2_preview(request):
     return render(request, 'portfolios/light_template2.html')
 
 def step_one(request):
-    return render(request, 'portfolios/step_one.html')
+    return render(request, 'user_info/step_one.html')
 
 def step_two(request):
     profile_form = ProfileForm()
@@ -30,7 +30,7 @@ def step_two(request):
         'profile_form': profile_form,
         'sections': SECTIONS,
     }
-    return render(request, 'portfolios/step_two.html', context)
+    return render(request, 'user_info/step_two.html', context)
 
 def step_three(request):
-    return render(request, 'portfolios/step_three.html')
+    return render(request, 'user_info/step_three.html')
