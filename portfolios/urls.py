@@ -10,4 +10,5 @@ urlpatterns = [
     path('preview/light-2/', views.light_template2_preview, name='preview_light_2'),
     path('step-one/', views.step_one, name='step_one'),
     path('step-two/', views.step_two, name='step_two'),
+    path('step-three/', views.step_three, name='step_three'),
 ]

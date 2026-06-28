@@ -1,4 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from .forms import ProfileForm, PublicationForm, TeachingForm
+
+SECTIONS = [
+    'Personal Info', 'Professional Bio', 'Research Interests',
+    'Publications', 'Teaching Load', 'Contact Details',
+]
 
 def showInfo(request):
     return render(request, 'portfolios/showInfo.html')
@@ -19,4 +25,12 @@ def step_one(request):
     return render(request, 'portfolios/step_one.html')
 
 def step_two(request):
-    return render(request, 'user_info/step_two.html')
+    profile_form = ProfileForm()
+    context = {
+        'profile_form': profile_form,
+        'sections': SECTIONS,
+    }
+    return render(request, 'portfolios/step_two.html', context)
+
+def step_three(request):
+    return render(request, 'portfolios/step_three.html')

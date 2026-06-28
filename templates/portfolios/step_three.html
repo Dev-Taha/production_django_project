@@ -1,0 +1,19 @@
+{% extends "portfolios/steps_base.html" %}
+{% load static %}
+
+{% block step3_active %}active{% endblock %}
+
+{% block step_content %}
+<div class="step-content-container" style="min-height: 60vh; justify-content: center; align-items: center; display: flex; flex-direction: column;">
+    <div class="text-center">
+        <div style="width:80px;height:80px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
+            <i class="bi bi-check-lg" style="font-size:2.5rem;color:#16a34a;"></i>
+        </div>
+        <h1 class="step-title" style="font-size:2rem;">Review & Publish</h1>
+        <p class="step-subtitle" style="font-size:1rem;">Your data has been saved. Review your portfolio and publish it live.</p>
+        <a href="{% url 'dashboard:main_dashboard' %}" class="wizard-continue-btn active mt-4 d-inline-block">
+            Go to Dashboard <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+</div>
+{% endblock step_content %}
