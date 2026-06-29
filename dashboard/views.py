@@ -52,6 +52,16 @@ def templates_view(request):
         return redirect('accounts:login')
     user = get_current_user(request)
     profile = get_profile(user)
+
+    if request.method == 'POST':
+        selected_template = request.POST.get('selected_template', profile.selected_template)
+        valid_templates = {value for value, _ in profile.TEMPLATE_CHOICES}
+        if selected_template in valid_templates:
+            profile.selected_template = selected_template
+            profile.save()
+            messages.success(request, 'Template selection saved successfully.')
+            return redirect('dashboard:templates_dashboard')
+
     return render(request, 'dashboard/templates_dashboard.html', {
         'user': user,
         'profile': profile,

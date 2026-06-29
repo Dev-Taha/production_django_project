@@ -13,90 +13,109 @@
             <p class="text-secondary mb-0">Select a foundation for your research publication or website.</p>
         </div>
 
-        <div class="d-flex flex-column gap-3">
-            <!-- Card 1 (Active) -->
-            <div class="template-card active d-flex gap-3 p-3">
-                <div class="template-card-img bg-light rounded-2 flex-shrink-0 d-flex flex-column p-2 overflow-hidden border" style="width: 100px; height: 100px;">
-                    <div class="bg-secondary bg-opacity-25 rounded mb-2" style="height: 12px; width: 60%;"></div>
-                    <div class="bg-secondary bg-opacity-10 rounded mb-1 flex-grow-1"></div>
-                    <div class="bg-secondary bg-opacity-10 rounded" style="height: 15px;"></div>
-                </div>
-                <div class="d-flex flex-column justify-content-center">
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <h6 class="fw-bold mb-0">Classic Scholar</h6>
-                        <span class="template-badge-primary">ACTIVE</span>
+        <form method="post" id="template-selection-form" action="{% url 'dashboard:templates_dashboard' %}">
+            {% csrf_token %}
+            <input type="hidden" name="selected_template" id="selected-template-input"
+                value="{{ profile.selected_template|default:'classic-scholar' }}">
+            <div class="d-flex flex-column gap-3">
+                <!-- Card 1 -->
+                <div class="template-card {% if profile.selected_template == 'classic-scholar' %}active{% endif %} d-flex gap-3 p-3"
+                    data-template="classic-scholar">
+                    <div class="template-card-img bg-light rounded-2 flex-shrink-0 d-flex flex-column p-2 overflow-hidden border"
+                        style="width: 100px; height: 100px;">
+                        <div class="bg-secondary bg-opacity-25 rounded mb-2" style="height: 12px; width: 60%;"></div>
+                        <div class="bg-secondary bg-opacity-10 rounded mb-1 flex-grow-1"></div>
+                        <div class="bg-secondary bg-opacity-10 rounded" style="height: 15px;"></div>
                     </div>
-                    <p class="text-secondary small mb-2 lh-sm">Traditional light aesthetic with serif focus.</p>
-                    <div class="d-flex gap-2">
-                        <span class="template-badge">Light Mode</span>
-                        <span class="template-badge">Serif</span>
+                    <div class="d-flex flex-column justify-content-center">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h6 class="fw-bold mb-0">Classic Scholar</h6>
+                            {% if profile.selected_template == 'classic-scholar' %}
+                            <span class="template-badge-primary">ACTIVE</span>
+                            {% endif %}
+                        </div>
+                        <p class="text-secondary small mb-2 lh-sm">Traditional light aesthetic with serif focus.</p>
+                        <div class="d-flex gap-2">
+                            <span class="template-badge">Light Mode</span>
+                            <span class="template-badge">Serif</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Card 2 -->
-            <div class="template-card d-flex gap-3 p-3">
-                <div class="template-card-img bg-dark rounded-2 flex-shrink-0 d-flex flex-column p-2 overflow-hidden" style="width: 100px; height: 100px;">
-                    <div class="d-flex gap-1 mb-1">
-                        <div class="bg-white bg-opacity-25 rounded" style="height: 8px; width: 30%;"></div>
-                        <div class="bg-white bg-opacity-10 rounded flex-grow-1" style="height: 8px;"></div>
+                <!-- Card 2 -->
+                <div class="template-card {% if profile.selected_template == 'modern-dark' %}active{% endif %} d-flex gap-3 p-3"
+                    data-template="modern-dark">
+                    <div class="template-card-img bg-dark rounded-2 flex-shrink-0 d-flex flex-column p-2 overflow-hidden"
+                        style="width: 100px; height: 100px;">
+                        <div class="d-flex gap-1 mb-1">
+                            <div class="bg-white bg-opacity-25 rounded" style="height: 8px; width: 30%;"></div>
+                            <div class="bg-white bg-opacity-10 rounded flex-grow-1" style="height: 8px;"></div>
+                        </div>
+                        <div class="bg-primary bg-opacity-25 rounded flex-grow-1"></div>
                     </div>
-                    <div class="bg-primary bg-opacity-25 rounded flex-grow-1"></div>
+                    <div class="d-flex flex-column justify-content-center">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h6 class="fw-bold mb-0">Modern Dark</h6>
+                        </div>
+                        <p class="text-secondary small mb-2 lh-sm">High-contrast engineering look for tech research.</p>
+                        <div class="d-flex gap-2">
+                            <span class="template-badge">Dark Mode</span>
+                            <span class="template-badge">Sans-Serif</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="d-flex flex-column justify-content-center">
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <h6 class="fw-bold mb-0">Modern Dark</h6>
-                    </div>
-                    <p class="text-secondary small mb-2 lh-sm">High-contrast engineering look for tech research.</p>
-                    <div class="d-flex gap-2">
-                        <span class="template-badge">Dark Mode</span>
-                        <span class="template-badge">Sans-Serif</span>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Card 3 -->
-            <div class="template-card d-flex gap-3 p-3">
-                <div class="template-card-img bg-white rounded-2 flex-shrink-0 p-2 d-flex flex-wrap gap-1 overflow-hidden border" style="width: 100px; height: 100px;">
-                    <div class="bg-light rounded w-100 border" style="height: 15px;"></div>
-                    <div class="bg-light rounded border" style="height: 35px; width: 45%;"></div>
-                    <div class="bg-light rounded border" style="height: 35px; width: 45%;"></div>
-                    <div class="bg-light rounded w-100 flex-grow-1 border"></div>
-                </div>
-                <div class="d-flex flex-column justify-content-center">
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <h6 class="fw-bold mb-0">Minimalist Lab</h6>
+                <!-- Card 3 -->
+                <div class="template-card {% if profile.selected_template == 'minimalist-lab' %}active{% endif %} d-flex gap-3 p-3"
+                    data-template="minimalist-lab">
+                    <div class="template-card-img bg-white rounded-2 flex-shrink-0 p-2 d-flex flex-wrap gap-1 overflow-hidden border"
+                        style="width: 100px; height: 100px;">
+                        <div class="bg-light rounded w-100 border" style="height: 15px;"></div>
+                        <div class="bg-light rounded border" style="height: 35px; width: 45%;"></div>
+                        <div class="bg-light rounded border" style="height: 35px; width: 45%;"></div>
+                        <div class="bg-light rounded w-100 flex-grow-1 border"></div>
                     </div>
-                    <p class="text-secondary small mb-2 lh-sm">Clean clinical layout with maximum whitespace.</p>
-                    <div class="d-flex gap-2">
-                        <span class="template-badge">Light Mode</span>
-                        <span class="template-badge">Precise Grid</span>
+                    <div class="d-flex flex-column justify-content-center">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h6 class="fw-bold mb-0">Minimalist Lab</h6>
+                        </div>
+                        <p class="text-secondary small mb-2 lh-sm">Clean clinical layout with maximum whitespace.</p>
+                        <div class="d-flex gap-2">
+                            <span class="template-badge">Light Mode</span>
+                            <span class="template-badge">Precise Grid</span>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Card 4 -->
+                <div class="template-card {% if profile.selected_template == 'executive-academic' %}active{% endif %} d-flex gap-3 p-3"
+                    data-template="executive-academic">
+                    <div class="template-card-img bg-black rounded-2 flex-shrink-0 d-flex flex-column position-relative overflow-hidden p-2"
+                        style="width: 100px; height: 100px;">
+                        <div class="position-absolute top-0 start-0 w-100 h-100"
+                            style="background: linear-gradient(135deg, rgba(29,78,216,0.2) 0%, rgba(0,0,0,0) 100%);">
+                        </div>
+                        <div class="bg-white bg-opacity-25 rounded w-100 position-relative z-1 mb-2"
+                            style="height: 10px;"></div>
+                        <div class="d-flex gap-2 flex-grow-1 position-relative z-1">
+                            <div class="bg-primary bg-opacity-50 rounded h-100" style="width: 30%;"></div>
+                            <div class="bg-white bg-opacity-10 rounded h-100 flex-grow-1"></div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column justify-content-center">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h6 class="fw-bold mb-0">Executive Academic</h6>
+                        </div>
+                        <p class="text-secondary small mb-2 lh-sm">Premium dark style for leadership profiles.</p>
+                        <div class="d-flex gap-2">
+                            <span class="template-badge">Dark Mode</span>
+                            <span class="template-badge">Premium</span>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary-custom fw-semibold px-4 py-2">Save Template</button>
             </div>
-            
-            <!-- Card 4 -->
-            <div class="template-card d-flex gap-3 p-3">
-                <div class="template-card-img bg-black rounded-2 flex-shrink-0 d-flex flex-column position-relative overflow-hidden p-2" style="width: 100px; height: 100px;">
-                    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(135deg, rgba(29,78,216,0.2) 0%, rgba(0,0,0,0) 100%);"></div>
-                    <div class="bg-white bg-opacity-25 rounded w-100 position-relative z-1 mb-2" style="height: 10px;"></div>
-                    <div class="d-flex gap-2 flex-grow-1 position-relative z-1">
-                        <div class="bg-primary bg-opacity-50 rounded h-100" style="width: 30%;"></div>
-                        <div class="bg-white bg-opacity-10 rounded h-100 flex-grow-1"></div>
-                    </div>
-                </div>
-                <div class="d-flex flex-column justify-content-center">
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <h6 class="fw-bold mb-0">Executive Academic</h6>
-                    </div>
-                    <p class="text-secondary small mb-2 lh-sm">Premium dark style for leadership profiles.</p>
-                    <div class="d-flex gap-2">
-                        <span class="template-badge">Dark Mode</span>
-                        <span class="template-badge">Premium</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </form>
     </div>
 
     <!-- Right Column: Live Preview & Customizer -->
@@ -108,7 +127,9 @@
             </div>
             <div class="d-flex gap-2">
                 <button class="btn btn-primary btn-sm preview-device-btn"><i class="bi bi-display"></i></button>
-                <a href="#" target="_blank" id="open-new-tab-btn" class="btn btn-outline-secondary btn-sm preview-device-btn"><i class="bi bi-box-arrow-up-right"></i></a>
+                <a href="#" target="_blank" id="open-new-tab-btn"
+                    class="btn btn-outline-secondary btn-sm preview-device-btn"><i
+                        class="bi bi-box-arrow-up-right"></i></a>
             </div>
         </div>
 
@@ -121,7 +142,8 @@
                     <span class="browser-dot dot-yellow"></span>
                     <span class="browser-dot dot-green"></span>
                 </div>
-                <div class="browser-url-bar d-flex align-items-center justify-content-center flex-grow-1 mx-3 rounded-2 px-3 py-1">
+                <div
+                    class="browser-url-bar d-flex align-items-center justify-content-center flex-grow-1 mx-3 rounded-2 px-3 py-1">
                     <i class="bi bi-lock-fill text-secondary me-2 small"></i>
                     <span class="text-secondary small">preview.smartapp.io/scholar-template-01</span>
                 </div>
@@ -130,16 +152,30 @@
                     <i class="bi bi-three-dots-vertical"></i>
                 </div>
             </div>
-            
+
             <!-- Browser Body -->
             <div class="browser-body bg-white p-0" style="height: 450px; overflow-y: auto;">
                 <!-- Content will be injected dynamically -->
             </div>
         </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const cards = document.querySelectorAll('.template-card[data-template]');
+                const input = document.getElementById('selected-template-input');
+                cards.forEach(card => {
+                    card.addEventListener('click', function () {
+                        cards.forEach(c => c.classList.remove('active'));
+                        this.classList.add('active');
+                        input.value = this.dataset.template;
+                    });
+                });
+            });
+        </script>
 
         <!-- Style Customizer Panel -->
         <div class="customizer-panel p-4 d-flex flex-wrap flex-sm-nowrap align-items-center gap-3">
-            <div class="customizer-icon rounded-circle d-flex align-items-center justify-content-center text-primary-blue bg-primary bg-opacity-10 flex-shrink-0" style="width: 48px; height: 48px; font-size: 1.25rem;">
+            <div class="customizer-icon rounded-circle d-flex align-items-center justify-content-center text-primary-blue bg-primary bg-opacity-10 flex-shrink-0"
+                style="width: 48px; height: 48px; font-size: 1.25rem;">
                 <i class="bi bi-palette-fill"></i>
             </div>
             <div class="flex-grow-1">
