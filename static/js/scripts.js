@@ -313,6 +313,11 @@ function removeTag(i) {
 document.addEventListener("DOMContentLoaded", () => {
     // Tag input listener
     const tagInput = document.getElementById('tag-input');
+    const tagVal = document.getElementById('research-interests-val');
+    if (tagVal && tagVal.value.trim()) {
+        tags = tagVal.value.split(/[,\n]+/).map(t => t.trim()).filter(Boolean);
+        renderTags();
+    }
     if (tagInput) {
         tagInput.addEventListener('keydown', e => {
             if ((e.key === 'Enter' || e.key === ',') && tagInput.value.trim()) {

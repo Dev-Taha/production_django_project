@@ -36,6 +36,7 @@ class Profile(models.Model):
 
     google_scholar = models.URLField(blank=True, null=True)
     research_gate  = models.URLField(blank=True, null=True)
+    research_interests = models.TextField(blank=True, default='')
     created_at     = models.DateTimeField(auto_now_add=True)
     updated_at     = models.DateTimeField(auto_now=True)
 

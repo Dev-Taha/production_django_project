@@ -13,74 +13,235 @@
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <!-- Photo -->
-        <div class="row g-4 mb-4 align-items-center">
-            <div class="col-md-2 text-center">
-                {% if profile.profile_picture %}
-                    <img src="{{ profile.profile_picture.url }}"
-                         class="rounded-circle"
-                         style="width:90px;height:90px;object-fit:cover">
-                {% else %}
-                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto"
-                         style="width:90px;height:90px">
-                        <i class="bi bi-person-fill text-white fs-2"></i>
+        <div class="card shadow-sm rounded-3 mb-4 border-0">
+            <div class="card-header bg-white border-bottom py-3 px-4">
+                <h5 class="mb-1 fw-bold">Personal Information</h5>
+                <p class="text-secondary small mb-0">Update your academic profile details.</p>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-4 align-items-center mb-4">
+                    <div class="col-md-2 text-center">
+                        {% if profile.profile_picture %}
+                        <img src="{{ profile.profile_picture.url }}" class="rounded-circle"
+                            style="width:90px;height:90px;object-fit:cover">
+                        {% else %}
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto"
+                            style="width:90px;height:90px">
+                            <i class="bi bi-person-fill text-white fs-2"></i>
+                        </div>
+                        {% endif %}
                     </div>
-                {% endif %}
-            </div>
-            <div class="col-md-10">
-                <label class="form-label fw-semibold small">Profile Picture</label>
-                {{ form.profile_picture }}
-                <div class="text-secondary" style="font-size:.75rem">JPG or PNG. Max 5MB.</div>
+                    <div class="col-md-10">
+                        <label class="form-label fw-semibold small">Profile Picture</label>
+                        <div class="mb-2">
+                            {{ form.profile_picture }}
+                        </div>
+                        <div class="text-secondary" style="font-size:.75rem">JPG or PNG. Max 5MB.</div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Full Name</label>
+                        {{ form.full_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Academic Title</label>
+                        {{ form.academic_title }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Institution</label>
+                        {{ form.institution }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Field of Study</label>
+                        {{ form.field_of_study }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold small">Biography</label>
+                        {{ form.bio }}
+                    </div>
+                </div>
             </div>
         </div>
 
-        <hr class="mb-4">
-
-        <!-- Personal Info -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-6">
-                <label class="form-label fw-semibold small">Full Name</label>
-                {{ form.full_name }}
+        <div class="card shadow-sm rounded-3 mb-4 border-0">
+            <div class="card-header bg-white border-bottom py-3 px-4">
+                <h5 class="mb-1 fw-bold">Research Interests</h5>
+                <p class="text-secondary small mb-0">Describe the topics that define your expertise.</p>
             </div>
-            <div class="col-md-6">
-                <label class="form-label fw-semibold small">Academic Title</label>
-                {{ form.academic_title }}
-            </div>
-            <div class="col-md-6">
-                <label class="form-label fw-semibold small">Institution</label>
-                {{ form.institution }}
-            </div>
-            <div class="col-md-6">
-                <label class="form-label fw-semibold small">Field of Study</label>
-                {{ form.field_of_study }}
-            </div>
-            <div class="col-12">
-                <label class="form-label fw-semibold small">Biography</label>
-                {{ form.bio }}
+            <div class="card-body p-4">
+                <div class="col-12">
+                    <label class="form-label fw-semibold small">Research Interests</label>
+                    <div class="tag-input-box" id="tag-box">
+                        <input type="text" id="tag-input" class="form-control border-0 p-0"
+                            placeholder="Add a research tag…">
+                    </div>
+                    <input type="hidden" name="research_interests" id="research-interests-val"
+                        value="{{ form.research_interests.value|default:profile.research_interests }}">
+                    <p class="text-secondary small mt-2">Press Enter or comma to save each keyword.</p>
+                </div>
             </div>
         </div>
 
-        <hr class="mb-4">
-
-        <!-- Academic Links -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-6">
-                <label class="form-label fw-semibold small">Google Scholar</label>
-                {{ form.google_scholar }}
+        <div class="card shadow-sm rounded-3 mb-4 border-0">
+            <div class="card-header bg-white border-bottom py-3 px-4">
+                <h5 class="mb-1 fw-bold">Publications</h5>
+                <p class="text-secondary small mb-0">Edit your saved publications or add a new one.</p>
             </div>
-            <div class="col-md-6">
-                <label class="form-label fw-semibold small">ResearchGate</label>
-                {{ form.research_gate }}
+            <div class="card-body p-4">
+                {% for pub in publications %}
+                <div class="publication-row mb-4 p-3 rounded-3 bg-light">
+                    <input type="hidden" name="pub_id[]" value="{{ pub.id }}">
+                    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                        <div>
+                            <div class="fw-semibold">Publication #{{ forloop.counter }}</div>
+                            <div class="text-secondary small">Edit fields below to update, or delete to remove.</div>
+                        </div>
+                        <a href="{% url 'dashboard:delete_publication' pub.id %}?next={% url 'dashboard:edit_profile' %}"
+                            class="btn btn-sm btn-outline-danger">Delete</a>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Title</label>
+                            <input type="text" name="pub_title[]" class="form-control" placeholder="Publication title"
+                                value="{{ pub.title }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Publication Date</label>
+                            <input type="date" name="pub_date[]" class="form-control"
+                                value="{{ pub.publication_date|date:'Y-m-d'|default:'' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">PDF Link</label>
+                            <input type="url" name="pub_pdf[]" class="form-control" placeholder="https://..."
+                                value="{{ pub.pdf_link }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">GitHub Link</label>
+                            <input type="url" name="pub_github[]" class="form-control"
+                                placeholder="https://github.com/..." value="{{ pub.github_link }}">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div class="publication-row mb-4 p-3 rounded-3 bg-white border">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Title</label>
+                            <input type="text" name="pub_title[]" class="form-control"
+                                placeholder="New publication title">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Publication Date</label>
+                            <input type="date" name="pub_date[]" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">PDF Link</label>
+                            <input type="url" name="pub_pdf[]" class="form-control" placeholder="https://...">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">GitHub Link</label>
+                            <input type="url" name="pub_github[]" class="form-control"
+                                placeholder="https://github.com/...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm rounded-3 mb-4 border-0">
+            <div class="card-header bg-white border-bottom py-3 px-4">
+                <h5 class="mb-1 fw-bold">Teaching</h5>
+                <p class="text-secondary small mb-0">Edit saved courses or add a new one.</p>
+            </div>
+            <div class="card-body p-4">
+                {% for teach in teachings %}
+                <div class="teaching-row mb-4 p-3 rounded-3 bg-light">
+                    <input type="hidden" name="teach_id[]" value="{{ teach.id }}">
+                    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                        <div>
+                            <div class="fw-semibold">Course #{{ forloop.counter }}</div>
+                            <div class="text-secondary small">Edit fields below to update, or delete to remove.</div>
+                        </div>
+                        <a href="{% url 'dashboard:delete_teaching' teach.id %}?next={% url 'dashboard:edit_profile' %}"
+                            class="btn btn-sm btn-outline-danger">Delete</a>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Course Name</label>
+                            <input type="text" name="course_name[]" class="form-control"
+                                placeholder="e.g. Machine Learning 101" value="{{ teach.course_name }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Semester</label>
+                            <input type="text" name="teachingscol[]" class="form-control" placeholder="e.g. Fall 2024"
+                                value="{{ teach.teachingscol }}">
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold small">Description</label>
+                            <textarea name="course_desc[]" class="form-control" rows="3"
+                                placeholder="Course description...">{{ teach.description }}</textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small">Syllabus Link</label>
+                            <input type="url" name="syllabus_link[]" class="form-control" placeholder="https://..."
+                                value="{{ teach.syllabus_link }}">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div class="teaching-row mb-4 p-3 rounded-3 bg-white border">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Course Name</label>
+                            <input type="text" name="course_name[]" class="form-control" placeholder="New course name">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Semester</label>
+                            <input type="text" name="teachingscol[]" class="form-control" placeholder="e.g. Fall 2024">
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold small">Description</label>
+                            <textarea name="course_desc[]" class="form-control" rows="3"
+                                placeholder="Course description..."></textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small">Syllabus Link</label>
+                            <input type="url" name="syllabus_link[]" class="form-control" placeholder="https://...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm rounded-3 mb-4 border-0">
+            <div class="card-header bg-white border-bottom py-3 px-4">
+                <h5 class="mb-1 fw-bold">Contact & Social Networks</h5>
+                <p class="text-secondary small mb-0">Add your academic profile links.</p>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Google Scholar</label>
+                        {{ form.google_scholar }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">ResearchGate</label>
+                        {{ form.research_gate }}
+                    </div>
+                </div>
             </div>
         </div>
 
         {% if form.errors %}
-            <div class="alert alert-danger small">Please fix the errors above.</div>
+        <div class="alert alert-danger small">Please fix the errors above.</div>
         {% endif %}
 
         <div class="d-flex justify-content-end gap-3 mt-4">
-            <a href="{% url 'dashboard:main_dashboard' %}"
-               class="btn btn-outline-secondary px-4">Cancel</a>
+            <a href="{% url 'dashboard:main_dashboard' %}" class="btn btn-outline-secondary px-4">Cancel</a>
             <button type="submit" class="btn btn-primary-custom px-4">
                 <i class="bi bi-check-lg me-1"></i>Save Changes
             </button>

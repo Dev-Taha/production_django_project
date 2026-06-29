@@ -9,7 +9,7 @@ class ProfileForm(forms.ModelForm):
         fields = [
             'full_name', 'academic_title', 'institution',
             'field_of_study', 'bio', 'profile_picture',
-            'google_scholar', 'research_gate'
+            'google_scholar', 'research_gate', 'research_interests'
         ]
         widgets = {
             'full_name': forms.TextInput(attrs={
@@ -39,7 +39,8 @@ class ProfileForm(forms.ModelForm):
                 'required': True,
             }),
             'profile_picture': forms.FileInput(attrs={
-                'class': 'd-none',
+                'class': 'form-control',
+                'accept': 'image/*',
                 'required': False,
             }),
             'google_scholar': forms.URLInput(attrs={
@@ -50,6 +51,12 @@ class ProfileForm(forms.ModelForm):
             'research_gate': forms.URLInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'https://www.researchgate.net/...',
+                'required': False,
+            }),
+            'research_interests': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'e.g. NLP, Computer Vision, Responsible AI',
                 'required': False,
             }),
         }
