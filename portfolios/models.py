@@ -11,6 +11,7 @@ from django.utils.text import slugify
 
 from accounts.models import User
 
+
 class Theme(models.Model):
     slug = models.SlugField(unique=True, max_length=100)
     name = models.CharField(max_length=100)
@@ -30,6 +31,7 @@ class Theme(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Profile(models.Model):
     user = models.OneToOneField(
@@ -65,6 +67,28 @@ class Profile(models.Model):
     theme = models.ForeignKey(Theme, on_delete=models.SET_NULL, null=True, blank=True)
     is_published = models.BooleanField(default=False)
 
+    # Template choice (selectable template skin, separate from `theme`)
+    TEMPLATE_CLASSIC = 'classic-scholar'
+    TEMPLATE_MODERN = 'modern-dark'
+    TEMPLATE_MINIMAL = 'minimalist-lab'
+    TEMPLATE_EXECUTIVE = 'executive-academic'
+
+    TEMPLATE_CHOICES = [
+        (TEMPLATE_CLASSIC, 'Classic Scholar'),
+        (TEMPLATE_MODERN, 'Modern Dark'),
+        (TEMPLATE_MINIMAL, 'Minimalist Lab'),
+        (TEMPLATE_EXECUTIVE, 'Executive Academic'),
+    ]
+
+    selected_template = models.CharField(
+        max_length=50,
+        choices=TEMPLATE_CHOICES,
+        blank=True,
+        null=True,
+        default=TEMPLATE_CLASSIC,
+    )
+
+    research_interests = models.TextField(blank=True, default='')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -91,7 +115,7 @@ class Profile(models.Model):
 
 
 class ResearchInterest(models.Model):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="research_interests")
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="research_interests_entries")
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     tags = models.CharField(max_length=255, blank=True, help_text="Comma-separated keywords")
@@ -109,71 +133,31 @@ class ResearchInterest(models.Model):
 
 
 class Publication(models.Model):
-    PUB_TYPES = [
-        ("conference", "Conference"),
-        ("journal", "Journal"),
-        ("workshop", "Workshop"),
-        ("preprint", "Preprint"),
-        ("book", "Book Chapter"),
-    ]
-
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="publications")
-    title = models.CharField(max_length=500)
-    authors = models.CharField(
-        max_length=500,
-        help_text="Wrap your own name with **double asterisks** to bold it, e.g. 'Chen, L., **Ali, A.**, Park, S.'",
-    )
-    venue = models.CharField(max_length=255, blank=True)
-    year = models.PositiveIntegerField()
-    pub_type = models.CharField(max_length=20, choices=PUB_TYPES, default="conference")
-    doi = models.CharField(max_length=100, blank=True)
-    abstract = models.TextField(blank=True)
-    pdf_link = models.URLField(blank=True)
-    external_url = models.URLField(blank=True, help_text="arXiv / journal page")
-    code_link = models.URLField(blank=True)
-    is_featured = models.BooleanField(default=False)
-    order_index = models.PositiveIntegerField(default=0)
-
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    pdf_link = models.TextField(blank=True)
+    github_link = models.CharField(max_length=500, blank=True)
+    publication_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-year", "order_index"]
+        ordering = ["-publication_date"]
 
     def __str__(self):
-        return f"{self.title} ({self.year})"
-
-    @property
-    def authors_html(self):
-        """Convert **name** → <strong>name</strong> for templates."""
-        return re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", self.authors)
+        return self.title
 
 
 class Teaching(models.Model):
-    ROLE_CHOICES = [
-        ("instructor", "Instructor"),
-        ("co_instructor", "Co-Instructor"),
-        ("ta", "Teaching Assistant"),
-        ("guest", "Guest Lecturer"),
-    ]
-
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="teachings")
-    course_code = models.CharField(max_length=20, blank=True, help_text="e.g. 'CS-447'")
-    course_name = models.CharField(max_length=255)
-    term = models.CharField(max_length=50, blank=True, help_text="e.g. 'Fall 2025'")
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="instructor")
+    course_name = models.CharField(max_length=45)
     description = models.TextField(blank=True)
-    syllabus_link = models.URLField(blank=True)
-    order_index = models.PositiveIntegerField(default=0)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["order_index"]
+    syllabus_link = models.URLField(blank=True, null=True)
+    teachingscol = models.CharField(max_length=45, blank=True)
 
     def __str__(self):
-        return f"{self.course_code} {self.course_name}".strip()
+        return self.course_name
 
 
 class Education(models.Model):
@@ -245,62 +229,3 @@ class ContactLink(models.Model):
     @property
     def icon_class(self):
         return self.ICON_MAP.get(self.link_type, "bi-link-45deg")
-
-
-
-class Media(models.Model):
-    profile = models.ForeignKey(
-        Profile, on_delete=models.CASCADE, related_name="medias"
-    )
-    file = models.FileField(                         # Fixed: was URLField (external only)
-        upload_to="media/", blank=True, null=True,
-    )
-    caption = models.CharField(max_length=255, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)  #new added
-
-    class Meta:
-        ordering = ["-created_at"]
-
-    def __str__(self):
-        return self.caption or (self.file.name if self.file else "Media")
-
-class Page(models.Model):
-    profile = models.ForeignKey(
-        Profile, on_delete=models.CASCADE, related_name="pages"
-    )
-    title = models.CharField(max_length=255)
-    order_index = models.IntegerField(default=0)
-
-    class Meta:
-        ordering = ["order_index"]
-
-    def __str__(self):
-        return self.title
-
-class Content(models.Model):
-    BLOCK_TYPES = [
-        ("text", "Text"),
-        ("image", "Image"),
-        ("carousel", "Carousel"),
-        ("video", "Video"),
-        ("quote", "Quote"),
-    ]
-
-    page = models.ForeignKey(
-        Page, on_delete=models.CASCADE, related_name="contents"
-    )
-    block_type = models.CharField(max_length=50, choices=BLOCK_TYPES, default="text")
-    title = models.CharField(max_length=255, blank=True)
-    body = models.TextField(blank=True)  #  FIXED: needed for text/quote blocks
-    image = models.ImageField(       # FIXED: needed for image blocks
-        upload_to="content/", blank=True, null=True,
-    )
-    order_index = models.IntegerField(default=0)
-
-    class Meta:
-        ordering = ["order_index"]
-
-    def __str__(self):
-        return f"{self.block_type} - {self.page.title}"
-
-

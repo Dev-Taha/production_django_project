@@ -10,11 +10,12 @@ import requests
 from urllib.parse import urlencode
 from django.views import View
 from django.conf import settings
+from portfolios.models import Profile
 
 def login(request):
 
     if 'user_id' in request.session: 
-        return redirect('dashboard:main_dashboard')
+        return redirect('portfolios:onboarding_one')
     context = {'login_form': LoginForm()}
 
     if request.method == 'POST':
@@ -28,7 +29,7 @@ def login(request):
                 logged_user = user_list[0]
                 if bcrypt.checkpw(password_input.encode(), logged_user.password.encode()):
                     request.session['user_id'] = logged_user.id
-                    return redirect('dashboard:main_dashboard')
+                    return redirect('portfolios:onboarding_one')
             
             messages.error(request, "Invalid Email or Password")
             
@@ -43,7 +44,7 @@ def login(request):
 def register(request):
 
     if 'user_id' in request.session:
-        return redirect('dashboard:main_dashboard')
+        return redirect('portfolios:onboarding_one')
  
     context = {'reg_form': RegisterForm()}
 
@@ -54,9 +55,12 @@ def register(request):
             password = reg_form.cleaned_data['password']
             user.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
             user.save()
-            
+            Profile.objects.create(
+                user      = user,
+                full_name = f"{user.first_name} {user.last_name}",
+            )
             request.session['user_id'] = user.id 
-            return redirect('dashboard:main_dashboard')
+            return redirect('portfolios:onboarding_one')
         
         context['reg_form'] = reg_form
 
@@ -138,7 +142,7 @@ class GoogleCallbackView(View):
         request.session['user_name'] = user.first_name
 
         messages.success(request, f'Welcome {user.first_name}!')
-        return redirect('dashboard:main_dashboard')
+        return redirect('portfolios:onboarding_one')
 
     def _exchange_code_for_token(self, code):
         """POST request to Google to exchange code for access token."""
@@ -208,3 +212,4 @@ class GoogleCallbackView(View):
             password=None,  # No password for Google users
         )
         return user
+

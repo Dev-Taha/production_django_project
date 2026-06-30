@@ -93,7 +93,8 @@
                     <span class="browser-dot dot-yellow"></span>
                     <span class="browser-dot dot-green"></span>
                 </div>
-                <div class="browser-url-bar d-flex align-items-center justify-content-center flex-grow-1 mx-3 rounded-2 px-3 py-1">
+                <div
+                    class="browser-url-bar d-flex align-items-center justify-content-center flex-grow-1 mx-3 rounded-2 px-3 py-1">
                     <i class="bi bi-lock-fill text-secondary me-2 small"></i>
                     <span class="text-secondary small" id="preview-url-text">
                         preview.smartweb.io/{{ active_theme.slug|default:"none" }}
@@ -170,9 +171,6 @@
         // Update URL bar
         const urlText = document.getElementById('preview-url-text');
         if (urlText) urlText.textContent = `preview.smartweb.io/${slug}`;
-
-        // Update "open in new tab" button
-<!--        const openBtn = document.getElementById('open-new-tab-btn');-->
 
         // Update "Save & Publish" hidden field so it activates the previewed theme
         const slugInput = document.getElementById('set-theme-slug');

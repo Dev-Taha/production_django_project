@@ -1,60 +1,126 @@
 """
-portfolios/views.py
+portfolios/onboarding.py
 
-Public portfolio view. Loads the user's data, then renders the template path
-stored on their chosen Theme. Same view handles every theme — the template
-swaps based on theme.template_path.
+Multi-step onboarding flow for newly registered users: collect profile info,
+publications, and teaching load, then let them pick a starting template.
 """
-from django.http import Http404
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render, redirect
 
-from .models import Profile, Theme
+from accounts.models import User
 
-from django.views.decorators.clickjacking import xframe_options_sameorigin
+from .models import Profile, Publication, Teaching
+from .forms import ProfileForm, PublicationForm, TeachingForm
 
-def _render_portfolio(request, profile, theme=None, preview_mode=False):
-    """Shared rendering logic for detail + preview."""
-    theme = theme or profile.theme
-    if not theme:
-        raise Http404("No theme selected.")
+SECTIONS = [
+    'Personal Info', 'Professional Bio', 'Research Interests',
+    'Publications', 'Teaching Load', 'Contact Details',
+]
+
+
+def get_current_user(request):
+    return User.objects.get(id=request.session['user_id'])
+
+
+def get_profile(user):
+    profile, _ = Profile.objects.get_or_create(
+        user=user,
+        defaults={'full_name': f"{user.first_name} {user.last_name}"}
+    )
+    return profile
+
+
+def onboarding_one(request):
+    return render(request, 'onboarding/onboarding1.html')
+
+
+def onboarding_two(request):
+    if 'user_id' not in request.session:
+        return redirect('accounts:login')
+
+    user = get_current_user(request)
+    profile = get_profile(user)
+
+    if request.method == 'POST':
+        profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
+        publication_form = PublicationForm(request.POST)
+        teaching_form = TeachingForm(request.POST)
+
+        if profile_form.is_valid() and publication_form.is_valid() and teaching_form.is_valid():
+            profile_form.save()
+
+            publication = publication_form.save(commit=False)
+            publication.profile = profile
+            publication.save()
+
+            teaching = teaching_form.save(commit=False)
+            teaching.profile = profile
+            teaching.save()
+
+            # Save additional publications from dynamic rows
+            pub_titles = request.POST.getlist('pub_title[]')
+            pub_dates = request.POST.getlist('pub_date[]')
+            pub_pdfs = request.POST.getlist('pub_pdf[]')
+            pub_githubs = request.POST.getlist('pub_github[]')
+            for idx, title in enumerate(pub_titles):
+                if not title.strip():
+                    continue
+                extra_pub = Publication(
+                    profile=profile,
+                    title=title.strip(),
+                    publication_date=pub_dates[idx] if idx < len(pub_dates) else None,
+                    pdf_link=pub_pdfs[idx] if idx < len(pub_pdfs) else '',
+                    github_link=pub_githubs[idx] if idx < len(pub_githubs) else '',
+                )
+                extra_pub.save()
+
+            # Save additional courses from dynamic rows
+            course_names = request.POST.getlist('course_name[]')
+            course_semesters = request.POST.getlist('teachingscol[]')
+            course_descs = request.POST.getlist('course_desc[]')
+            course_links = request.POST.getlist('syllabus_link[]')
+            for idx, name in enumerate(course_names):
+                if not name.strip():
+                    continue
+                extra_teaching = Teaching(
+                    profile=profile,
+                    course_name=name.strip(),
+                    teachingscol=course_semesters[idx] if idx < len(course_semesters) else '',
+                    description=course_descs[idx] if idx < len(course_descs) else '',
+                    syllabus_link=course_links[idx] if idx < len(course_links) else '',
+                )
+                extra_teaching.save()
+
+            return redirect('portfolios:onboarding_three')
+    else:
+        profile_form = ProfileForm(instance=profile)
+        publication_form = PublicationForm()
+        teaching_form = TeachingForm()
+
     context = {
-        "profile": profile,
-        "research_interests": profile.research_interests.all(),
-        "publications": profile.publications.all(),
-        "teachings": profile.teachings.all(),
-        "education": profile.education_entries.all(),
-        "contact_links": profile.contact_links.all(),
-        "preview_mode": preview_mode,
-        "active_theme": theme,
+        'profile_form': profile_form,
+        'publication_form': publication_form,
+        'teaching_form': teaching_form,
+        'sections': SECTIONS,
     }
-    return render(request, theme.template_path, context)
+    return render(request, 'onboarding/onboarding2.html', context)
 
 
-def portfolio_detail(request, slug):
-    """Public portfolio page — /portfolios/u/<slug>/"""
-    profile = get_object_or_404(Profile, slug=slug, is_published=True)
-    return _render_portfolio(request, profile)
+def onboarding_three(request):
+    if 'user_id' not in request.session:
+        return redirect('accounts:login')
 
-@xframe_options_sameorigin
-def portfolio_preview(request, theme_slug):
-    """
-    Preview endpoint — /portfolios/preview/<theme_slug>/
+    user = get_current_user(request)
+    profile = get_profile(user)
 
-    Loads the session-authenticated user's profile (if any), otherwise the
-    demo profile, then renders it with the specified theme. Used by the
-    Live Preview iframe in the dashboard.
-    """
-    theme = get_object_or_404(Theme, slug=theme_slug, is_active=True)
+    if request.method == 'POST':
+        selected_template = request.POST.get('selected_template', profile.selected_template or Profile.TEMPLATE_CLASSIC)
+        valid_templates = {value for value, _ in Profile.TEMPLATE_CHOICES}
+        if selected_template in valid_templates:
+            profile.selected_template = selected_template
+            profile.save()
+        return redirect('dashboard:main_dashboard')
 
-    profile = None
-    user_id = request.session.get("user_id")
-    if user_id:
-        profile = Profile.objects.filter(user_id=user_id).first()
-
-    if profile is None:
-        profile = Profile.objects.filter(slug="ahmed-ali").first()
-
-    if profile is None:
-        raise Http404("No portfolio data available to preview.")
-
-    return _render_portfolio(request, profile, theme=theme, preview_mode=True)
+    context = {
+        'selected_template': profile.selected_template or Profile.TEMPLATE_CLASSIC,
+    }
+    return render(request, 'onboarding/onboarding3.html', context)
