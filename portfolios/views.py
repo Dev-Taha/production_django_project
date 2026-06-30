@@ -4,11 +4,11 @@ portfolios/onboarding.py
 Multi-step onboarding flow for newly registered users: collect profile info,
 publications, and teaching load, then let them pick a starting template.
 """
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 from accounts.models import User
 
-from .models import Profile, Publication, Teaching
+from .models import Profile, Publication, Teaching, Theme
 from .forms import ProfileForm, PublicationForm, TeachingForm
 
 SECTIONS = [
@@ -124,3 +124,35 @@ def onboarding_three(request):
         'selected_template': profile.selected_template or Profile.TEMPLATE_CLASSIC,
     }
     return render(request, 'onboarding/onboarding3.html', context)
+
+
+def portfolio_detail(request, slug):
+    profile = get_object_or_404(Profile, slug=slug, is_published=True)
+    publications = Publication.objects.filter(profile=profile)
+    return render(request, 'portfolios/portfolio_detail.html', {
+        'profile': profile,
+        'publications': publications,
+    })
+
+
+def portfolio_preview(request, theme_slug):
+    theme = get_object_or_404(Theme, slug=theme_slug, is_active=True)
+    return render(request, 'portfolios/portfolio_preview.html', {
+        'theme': theme,
+    })
+
+
+def dark_template1_preview(request):
+    return render(request, 'portfolios/dark_template1.html')
+
+
+def dark_template2_preview(request):
+    return render(request, 'portfolios/dark_template2.html')
+
+
+def light_template1_preview(request):
+    return render(request, 'portfolios/light_template1.html')
+
+
+def light_template2_preview(request):
+    return render(request, 'portfolios/light_template2.html')

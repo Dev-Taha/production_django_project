@@ -1,10 +1,10 @@
-from django.shortcuts import render, redirect, get_object_or_404, redirect, render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from accounts.models import User
 from django.urls import reverse
 
-from portfolios.models import Theme, Profile,Profile, Publication, Teaching
-from portfolios.forms import PublicationForm,ProfileForm, TeachingForm
+from portfolios.models import Theme, Profile, Publication, Teaching
+from portfolios.forms import PublicationForm, ProfileForm, TeachingForm
 
 
 

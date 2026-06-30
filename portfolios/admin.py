@@ -44,17 +44,16 @@ class PublicationInline(admin.StackedInline):
     extra = 0
     fields = (
         "title",
-        "authors",
-        ("venue", "year", "pub_type"),
-        ("pdf_link", "external_url", "code_link"),
-        ("is_featured", "order_index"),
+        "description",
+        "publication_date",
+        ("pdf_link", "github_link"),
     )
 
 
 class TeachingInline(admin.TabularInline):
     model = Teaching
     extra = 0
-    fields = ("order_index", "course_code", "course_name", "term", "role", "syllabus_link")
+    fields = ("order_index", "course_name", "teachingscol", "description", "syllabus_link")
 
 
 class ContactLinkInline(admin.TabularInline):

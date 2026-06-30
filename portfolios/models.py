@@ -45,6 +45,7 @@ class Profile(models.Model):
     slug = models.SlugField(unique=True, max_length=120, blank=True)
     academic_title = models.CharField(max_length=255, blank=True)
     institution = models.CharField(max_length=255, blank=True)
+    field_of_study = models.CharField(max_length=255, blank=True)
     tagline = models.CharField(max_length=255, blank=True)
 
     # Bio
@@ -100,6 +101,10 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.full_name or self.user.get_username()
+
+    @property
+    def profile_picture(self):
+        return self.profile_image
 
     @property
     def bio_paragraphs(self):
