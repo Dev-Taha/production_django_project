@@ -197,3 +197,9 @@ EducationFormSet = inlineformset_factory(
     extra=1,
     can_delete=True,
 )
+ContactLinkFormSet = inlineformset_factory(
+    Profile, ContactLink,
+    form=ContactLinkForm,
+    extra=1,
+    can_delete=True,
+)
