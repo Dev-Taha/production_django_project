@@ -5,6 +5,8 @@ from django.urls import reverse
 
 from portfolios.models import Theme, Profile, Publication, Teaching
 from portfolios.forms import PublicationForm, ProfileForm, TeachingForm
+from .forms import AccountSettingsForm
+import bcrypt
 
 
 
@@ -102,11 +104,52 @@ def templates_view(request):
 def settings_view(request):
     if 'user_id' not in request.session:
         return redirect('accounts:login')
+
     user = get_current_user(request)
     profile = get_profile(user)
+
+    if request.method == 'POST':
+        form = AccountSettingsForm(request.POST, request.FILES, current_user=user)
+        if form.is_valid():
+            user.first_name = form.cleaned_data['first_name'].strip()
+            user.last_name = form.cleaned_data['last_name'].strip()
+            # email is read-only in the form; only update if different and allowed
+            user.email = form.cleaned_data['email'].strip()
+            if form.cleaned_data.get('new_password'):
+                user.password = bcrypt.hashpw(
+                    form.cleaned_data['new_password'].encode(),
+                    bcrypt.gensalt()
+                ).decode()
+            user.save()
+
+            profile.full_name = form.cleaned_data['full_name'].strip()
+            profile.academic_title = form.cleaned_data['academic_title'].strip()
+            profile.institution = form.cleaned_data['institution'].strip()
+            profile.field_of_study = form.cleaned_data['field_of_study'].strip()
+            profile.bio = form.cleaned_data['bio'].strip()
+
+            if request.FILES.get('profile_image'):
+                profile.profile_image = request.FILES['profile_image']
+
+            profile.save()
+            messages.success(request, 'Your settings were updated successfully.')
+            return redirect('dashboard:setting_dashboard')
+    else:
+        form = AccountSettingsForm(initial={
+            'first_name': user.first_name or '',
+            'last_name': user.last_name or '',
+            'email': user.email or '',
+            'full_name': profile.full_name or f"{user.first_name or ''} {user.last_name or ''}".strip(),
+            'academic_title': profile.academic_title or '',
+            'institution': profile.institution or '',
+            'field_of_study': profile.field_of_study or '',
+            'bio': profile.bio or '',
+        }, current_user=user)
+
     return render(request, 'dashboard/setting_dashboard.html', {
         'user': user,
         'profile': profile,
+        'form': form,
     })
 
 
