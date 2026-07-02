@@ -92,8 +92,7 @@
                     <input type="hidden" name="email" value="{{ user.email }}">
                     <i class="bi bi-patch-check-fill settings-input-right-icon text-dark" style="opacity: 0.75;"></i>
                 </div>
-                {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors|striptags }}</div>{%
-                endif %}
+                {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors|striptags }}</div>{% endif %}
             </div>
             <div class="col-md-6">
                 <label class="settings-label" for="{{ form.new_password.id_for_label }}">Password</label>
