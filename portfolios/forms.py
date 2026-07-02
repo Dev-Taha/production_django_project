@@ -1,5 +1,5 @@
 from django import forms
-from .models import Profile, Publication, Teaching, Media, Page,ContactLink,Education
+from .models import Profile, Publication, Teaching,ContactLink,Education
 
 
 # ── 1. Personal Info ─────────────────────────────────────────────────────
@@ -8,7 +8,7 @@ class ProfileForm(forms.ModelForm):
         model  = Profile
         fields = [
             'full_name', 'academic_title', 'institution',
-            'field_of_study', 'bio', 'profile_picture',
+            'field_of_study', 'bio', 'profile_image',
             'google_scholar', 'research_gate'
         ]
         widgets = {
@@ -33,9 +33,8 @@ class ProfileForm(forms.ModelForm):
                 'rows': 4,
                 'placeholder': 'Write a short academic biography...'
             }),
-            'profile_picture': forms.FileInput(attrs={
-                'class': 'form-control'
-            }),
+           'profile_image': forms.FileInput(attrs={'class': 'form-control'}),
+           
             'google_scholar': forms.URLInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'https://scholar.google.com/...'
@@ -107,36 +106,36 @@ class TeachingForm(forms.ModelForm):
 
 
 # ── 4. Media ─────────────────────────────────────────────────────────────
-class MediaForm(forms.ModelForm):
-    class Meta:
-        model  = Media
-        fields = ['file_path', 'caption']
-        widgets = {
-            'file_path': forms.URLInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'https://...'
-            }),
-            'caption': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Image caption...'
-            }),
-        }
+# class MediaForm(forms.ModelForm):
+#     class Meta:
+#         model  = Media
+#         fields = ['file_path', 'caption']
+#         widgets = {
+#             'file_path': forms.URLInput(attrs={
+#                 'class': 'form-control',
+#                 'placeholder': 'https://...'
+#             }),
+#             'caption': forms.TextInput(attrs={
+#                 'class': 'form-control',
+#                 'placeholder': 'Image caption...'
+#             }),
+#         }
 
 
 # ── 5. Page ──────────────────────────────────────────────────────────────
-class PageForm(forms.ModelForm):
-    class Meta:
-        model  = Page
-        fields = ['title', 'order_index']
-        widgets = {
-            'title': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'e.g. Publications'
-            }),
-            'order_index': forms.NumberInput(attrs={
-                'class': 'form-control'
-            }),
-        }
+# class PageForm(forms.ModelForm):
+#     class Meta:
+#         model  = Page
+#         fields = ['title', 'order_index']
+#         widgets = {
+#             'title': forms.TextInput(attrs={
+#                 'class': 'form-control',
+#                 'placeholder': 'e.g. Publications'
+#             }),
+#             'order_index': forms.NumberInput(attrs={
+#                 'class': 'form-control'
+#             }),
+#         }
 
 
 # ── 4. Education ─────────────────────────────────────────────────────────
