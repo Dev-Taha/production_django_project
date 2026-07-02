@@ -1,87 +1,87 @@
 // ── TEMPLATE DASHBOARD PREVIEW ──────────────────────────────────────────────
-document.addEventListener("DOMContentLoaded", () => {
-    const cards = document.querySelectorAll(".template-card");
-    if (cards.length === 0) return; // Only execute on the templates dashboard
-
-    const previewTitle = document.getElementById("preview-title");
-    const browserTitle = document.querySelector(".browser-url-bar span");
-    const openNewTabBtn = document.getElementById("open-new-tab-btn");
-    const selectedInput = document.getElementById("selected-template-input");
-    const frame = document.getElementById('preview-frame');
-
-    const themes = [
-        {
-            id: 'classic-scholar',
-            name: "Classic Scholar &mdash; Version 2.4.1",
-            displayUrl: "preview.smartapp.io/scholar-template",
-            src: "/portfolios/preview/academic-light/"
-        },
-        {
-            id: 'modern-dark',
-            name: "Modern Dark &mdash; Version 1.2.0",
-            displayUrl: "preview.smartapp.io/modern-dark-02",
-            src: "/portfolios/preview/modern-dark/"
-        },
-        {
-            id: 'minimalist-lab',
-            name: "Minimalist Lab &mdash; Version 3.1.2",
-            displayUrl: "preview.smartapp.io/min-lab",
-            src: "/portfolios/preview/modern-light/"
-        },
-        {
-            id: 'executive-academic',
-            name: "Executive Academic &mdash; Version 1.0.5",
-            displayUrl: "preview.smartapp.io/exec-academic",
-            src: "/portfolios/preview/academic-dark/"
-        }
-    ];
-
-    function setActiveCard(card, index) {
-        cards.forEach(c => {
-            c.classList.remove("active");
-            const badge = c.querySelector(".template-badge-primary");
-            if (badge) badge.remove();
-        });
-
-        card.classList.add("active");
-
-        const titleDiv = card.querySelector(".d-flex.align-items-center");
-        if (titleDiv && !titleDiv.querySelector(".template-badge-primary")) {
-            const badge = document.createElement("span");
-            badge.className = "template-badge-primary ms-2";
-            badge.textContent = "ACTIVE";
-            titleDiv.appendChild(badge);
-        }
-
-        if (selectedInput) {
-            selectedInput.value = card.dataset.template || themes[index]?.id || '';
-        }
-
-        if (previewTitle) previewTitle.innerHTML = themes[index].name;
-        if (browserTitle) browserTitle.textContent = themes[index].displayUrl;
-        if (openNewTabBtn) openNewTabBtn.href = themes[index].src;
-
-        if (frame) {
-            frame.style.opacity = '0';
-            frame.src = themes[index].src;
-            setTimeout(() => {
-                frame.style.opacity = '1';
-            }, 150);
-        }
-    }
-
-    cards.forEach((card, index) => {
-        card.addEventListener("click", () => setActiveCard(card, index));
-    });
-
-    const initialCard = document.querySelector('.template-card.active') || cards[0];
-    const initialIndex = Array.from(cards).indexOf(initialCard);
-    if (frame) {
-        frame.style.transition = 'opacity 0.15s ease-in-out';
-        if (openNewTabBtn) openNewTabBtn.href = themes[initialIndex]?.src || themes[0].src;
-        setActiveCard(initialCard, initialIndex >= 0 ? initialIndex : 0);
-    }
-});
+//document.addEventListener("DOMContentLoaded", () => {
+//    const cards = document.querySelectorAll(".template-card");
+//    if (cards.length === 0) return; // Only execute on the templates dashboard
+//
+//    const previewTitle = document.getElementById("preview-title");
+//    const browserTitle = document.querySelector(".browser-url-bar span");
+//    const openNewTabBtn = document.getElementById("open-new-tab-btn");
+//    const selectedInput = document.getElementById("selected-template-input");
+//    const frame = document.getElementById('preview-frame');
+//
+//    const themes = [
+//        {
+//            id: 'classic-scholar',
+//            name: "Classic Scholar &mdash; Version 2.4.1",
+//            displayUrl: "preview.smartapp.io/scholar-template",
+//            src: "/portfolios/preview/academic-light/"
+//        },
+//        {
+//            id: 'modern-dark',
+//            name: "Modern Dark &mdash; Version 1.2.0",
+//            displayUrl: "preview.smartapp.io/modern-dark-02",
+//            src: "/portfolios/preview/modern-dark/"
+//        },
+//        {
+//            id: 'minimalist-lab',
+//            name: "Minimalist Lab &mdash; Version 3.1.2",
+//            displayUrl: "preview.smartapp.io/min-lab",
+//            src: "/portfolios/preview/modern-light/"
+//        },
+//        {
+//            id: 'executive-academic',
+//            name: "Executive Academic &mdash; Version 1.0.5",
+//            displayUrl: "preview.smartapp.io/exec-academic",
+//            src: "/portfolios/preview/academic-dark/"
+//        }
+//    ];
+//
+//    function setActiveCard(card, index) {
+//        cards.forEach(c => {
+//            c.classList.remove("active");
+//            const badge = c.querySelector(".template-badge-primary");
+//            if (badge) badge.remove();
+//        });
+//
+//        card.classList.add("active");
+//
+//        const titleDiv = card.querySelector(".d-flex.align-items-center");
+//        if (titleDiv && !titleDiv.querySelector(".template-badge-primary")) {
+//            const badge = document.createElement("span");
+//            badge.className = "template-badge-primary ms-2";
+//            badge.textContent = "ACTIVE";
+//            titleDiv.appendChild(badge);
+//        }
+//
+//        if (selectedInput) {
+//            selectedInput.value = card.dataset.template || themes[index]?.id || '';
+//        }
+//
+//        if (previewTitle) previewTitle.innerHTML = themes[index].name;
+//        if (browserTitle) browserTitle.textContent = themes[index].displayUrl;
+//        if (openNewTabBtn) openNewTabBtn.href = themes[index].src;
+//
+//        if (frame) {
+//            frame.style.opacity = '0';
+//            frame.src = themes[index].src;
+//            setTimeout(() => {
+//                frame.style.opacity = '1';
+//            }, 150);
+//        }
+//    }
+//
+//    cards.forEach((card, index) => {
+//        card.addEventListener("click", () => setActiveCard(card, index));
+//    });
+//
+//    const initialCard = document.querySelector('.template-card.active') || cards[0];
+//    const initialIndex = Array.from(cards).indexOf(initialCard);
+//    if (frame) {
+//        frame.style.transition = 'opacity 0.15s ease-in-out';
+//        if (openNewTabBtn) openNewTabBtn.href = themes[initialIndex]?.src || themes[0].src;
+//        setActiveCard(initialCard, initialIndex >= 0 ? initialIndex : 0);
+//    }
+//});
 
 
 // ── ONBOARDING 1: WIZARD CARD SELECTION ─────────────────────────────────────
@@ -449,4 +449,61 @@ function addCourse() {
     c.appendChild(div);
     courseCount++;
     syncValidation();
+}
+
+
+// ── ONBOARDING 3: TEMPLATE PREVIEW ──────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById('template-selection-form');
+    if (!form) return; // only run on onboarding step 3
+
+    const cards = document.querySelectorAll(".template-card");
+    const previewTitle = document.getElementById("preview-title");
+    const openNewTabBtn = document.getElementById("open-new-tab-btn");
+    const selectedInput = document.getElementById("selected-template-input");
+    const urlText = document.getElementById("preview-url-text");
+    const frame = document.getElementById('preview-frame');
+
+    function activate(card) {
+        const slug = card.dataset.template;
+        if (!slug) return;
+
+        cards.forEach(c => {
+            c.classList.remove("active");
+            c.querySelector(".template-badge-primary")?.remove();
+        });
+        card.classList.add("active");
+
+        const titleDiv = card.querySelector(".d-flex.align-items-center");
+        if (titleDiv) {
+            const badge = document.createElement("span");
+            badge.className = "template-badge-primary ms-2";
+            badge.textContent = "ACTIVE";
+            titleDiv.appendChild(badge);
+        }
+
+        if (selectedInput) selectedInput.value = slug;
+
+        const previewUrl = `/portfolios/preview/${slug}/`;
+        const label = card.querySelector('h6')?.textContent || slug;
+
+        if (previewTitle) previewTitle.textContent = label;
+        if (openNewTabBtn) openNewTabBtn.href = previewUrl;
+        if (urlText) urlText.textContent = `preview.smartweb.io/${slug}`;
+
+        if (frame) {
+            frame.style.display = 'block';
+            frame.src = previewUrl;
+        }
+    }
+
+    cards.forEach(card => card.addEventListener("click", () => activate(card)));
+
+    const initial = document.querySelector('.template-card.active') || cards[0];
+    if (initial) activate(initial);
+});
+
+function refreshPreview() {
+    const frame = document.getElementById('preview-frame');
+    if (frame) frame.src = frame.src;
 }

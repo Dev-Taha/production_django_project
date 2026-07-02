@@ -13,6 +13,7 @@ from django.db import OperationalError
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.urls import reverse
 
 from accounts.models import User
 
@@ -120,16 +121,37 @@ def onboarding_three(request):
     user = get_current_user(request)
     profile = get_profile(user)
 
+    # All active themes for the gallery
+    themes = Theme.objects.filter(is_active=True).order_by('name')
     if request.method == 'POST':
-        selected_template = request.POST.get('selected_template', profile.selected_template or Profile.TEMPLATE_CLASSIC)
-        valid_templates = {value for value, _ in Profile.TEMPLATE_CHOICES}
-        if selected_template in valid_templates:
-            profile.selected_template = selected_template
+        theme_slug = request.POST.get('selected_template')
+        theme = themes.filter(slug=theme_slug).first()
+        if theme:
+            profile.theme = theme
+            profile.selected_template = theme_slug  # keeps existing choice field in sync
             profile.save()
-        return redirect('dashboard:main_dashboard')
+            return redirect('dashboard:main_dashboard')
+
+    preview_slug = request.GET.get('preview')
+    active_theme = None
+    if preview_slug:
+        active_theme = themes.filter(slug=preview_slug).first()
+
+    if active_theme is None:
+        active_theme = profile.theme
+
+    if active_theme is None:
+        active_theme = themes.first()
+
+    preview_url = None
+    if active_theme:
+        preview_url = reverse('portfolios:preview', args=[active_theme.slug])
 
     context = {
-        'selected_template': profile.selected_template or Profile.TEMPLATE_CLASSIC,
+        'themes': themes,
+        'active_theme': active_theme,
+        'selected_template': active_theme.slug if active_theme else Profile.TEMPLATE_CLASSIC,
+        'preview_url': preview_url,
     }
     return render(request, 'onboarding/onboarding3.html', context)
 
@@ -139,7 +161,11 @@ def portfolio_detail(request, slug):
     publications = Publication.objects.filter(profile=profile)
     return render(request, 'portfolios/portfolio_detail.html', {
         'profile': profile,
-        'publications': publications,
+        'publications': profile.publications.all(),
+        'teachings': profile.teachings.all(),
+        'research_interests': profile.research_interests_entries.all(),
+        'education': profile.education_entries.all(),
+        'contact_links': profile.contact_links.all(),
     })
 
 
@@ -197,6 +223,9 @@ def portfolio_preview(request, theme_slug):
     return render(request, theme.template_path, {
         'theme': theme,
         'profile': profile,
+        'publications': profile.publications.all(),
+        'teachings': profile.teachings.all(),
+        'research_interests': getattr(profile, 'research_interests', None),
+        'education': profile.education_entries.all() if hasattr(profile, 'education_entries') else [],
+        'contact_links': profile.contact_links.all() if hasattr(profile, 'contact_links') else [],
     })
-
-
