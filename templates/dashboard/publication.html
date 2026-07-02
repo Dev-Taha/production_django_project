@@ -1,0 +1,53 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0">{{ title }}</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Publication Title</label>
+                            {{ form.title }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description / Abstract</label>
+                            {{ form.description }}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Publication Date</label>
+                                {{ form.publication_date }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">GitHub Link</label>
+                                {{ form.github_link }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">PDF Link</label>
+                            {{ form.pdf_link }}
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <a href="{% url 'dashboard:main_dashboard' %}" class="btn btn-secondary me-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save Publication</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
