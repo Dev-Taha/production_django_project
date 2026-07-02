@@ -185,3 +185,9 @@ PublicationFormSet = inlineformset_factory(
     extra=1,
     can_delete=True,
 )
+TeachingFormSet = inlineformset_factory(
+    Profile, Teaching,
+    form=TeachingForm,
+    extra=1,
+    can_delete=True,
+)
