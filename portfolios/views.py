@@ -159,11 +159,24 @@ def onboarding_three(request):
 def portfolio_detail(request, slug):
     profile = get_object_or_404(Profile, slug=slug, is_published=True)
     publications = Publication.objects.filter(profile=profile)
+    # Normalize research interests: prefer ResearchInterest entries, fall back to
+    # legacy `profile.research_interests` text (one per line).
+    ri_qs = profile.research_interests_entries.all() if hasattr(profile, 'research_interests_entries') else []
+    if getattr(ri_qs, 'exists', None) and ri_qs.exists():
+        research_items = ri_qs
+    else:
+        text = getattr(profile, 'research_interests', '') or ''
+        # split on newlines or commas so legacy CSV-like entries become separate items
+        import re
+        parts = [p.strip() for p in re.split(r'[,\n]+', text) if p.strip()]
+        from types import SimpleNamespace
+        research_items = [SimpleNamespace(title=part, description='', tag_list=[]) for part in parts]
+
     return render(request, 'portfolios/portfolio_detail.html', {
         'profile': profile,
         'publications': profile.publications.all(),
         'teachings': profile.teachings.all(),
-        'research_interests': profile.research_interests_entries.all(),
+        'research_interests': research_items,
         'education': profile.education_entries.all(),
         'contact_links': profile.contact_links.all(),
     })
@@ -220,12 +233,22 @@ def portfolio_preview(request, theme_slug):
     profile = get_profile(user)
     theme = resolve_preview_theme(theme_slug)
 
+    ri_qs = profile.research_interests_entries.all() if hasattr(profile, 'research_interests_entries') else []
+    if getattr(ri_qs, 'exists', None) and ri_qs.exists():
+        research_items = ri_qs
+    else:
+        text = getattr(profile, 'research_interests', '') or ''
+        import re
+        parts = [p.strip() for p in re.split(r'[,\n]+', text) if p.strip()]
+        from types import SimpleNamespace
+        research_items = [SimpleNamespace(title=part, description='', tag_list=[]) for part in parts]
+
     return render(request, theme.template_path, {
         'theme': theme,
         'profile': profile,
         'publications': profile.publications.all(),
         'teachings': profile.teachings.all(),
-        'research_interests': getattr(profile, 'research_interests', None),
+        'research_interests': research_items,
         'education': profile.education_entries.all() if hasattr(profile, 'education_entries') else [],
         'contact_links': profile.contact_links.all() if hasattr(profile, 'contact_links') else [],
     })
