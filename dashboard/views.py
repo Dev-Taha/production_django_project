@@ -3,7 +3,8 @@ from django.contrib import messages
 from accounts.models import User
 from django.urls import reverse
 
-from portfolios.forms import PublicationForm, ProfileForm, TeachingForm, EducationForm, ContactLinkForm
+from portfolios.forms import PublicationForm, ProfileForm, TeachingForm, EducationForm, ContactLinkForm,PublicationFormSet, TeachingFormSet, EducationFormSet, ContactLinkFormSet
+
 from portfolios.models import Theme, Profile, Publication, Teaching, Education, ContactLink
 
 from .forms import AccountSettingsForm
