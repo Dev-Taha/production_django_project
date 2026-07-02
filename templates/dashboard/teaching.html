@@ -1,0 +1,75 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block nav_profile %}active{% endblock %}
+
+{% block dashboard_content %}
+
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">{{ title }}</h3>
+    <p class="text-secondary">Fill in the course details below.</p>
+</div>
+
+<div class="dashboard-card p-4 p-md-5">
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="card shadow-sm rounded-3 mb-4 border-0">
+            <div class="card-header bg-white border-bottom py-3 px-4">
+                <h5 class="mb-1 fw-bold">Course Details</h5>
+                <p class="text-secondary small mb-0">Add the information about this course.</p>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Course Name</label>
+                        {{ form.course_name }}
+                        {% if form.course_name.errors %}
+                        <div class="text-danger small mt-1">{{ form.course_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Semester</label>
+                        {{ form.semester }}
+                        {% if form.semester.errors %}
+                        <div class="text-danger small mt-1">{{ form.semester.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold small">Description</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold small">Syllabus Link</label>
+                        {{ form.syllabus_link }}
+                        {% if form.syllabus_link.errors %}
+                        <div class="text-danger small mt-1">{{ form.syllabus_link.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        {% if form.errors %}
+        <div class="alert alert-danger small">Please fix the errors above.</div>
+        {% endif %}
+
+        <div class="d-flex justify-content-end gap-3 mt-2">
+            <a href="{% url 'dashboard:main_dashboard' %}"
+               class="btn btn-outline-secondary px-4">Cancel</a>
+            <button type="submit" class="btn btn-primary-custom px-4">
+                <i class="bi bi-check-lg me-1"></i> Save Course
+            </button>
+        </div>
+
+    </form>
+</div>
+
+{% endblock dashboard_content %}
