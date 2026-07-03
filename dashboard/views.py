@@ -56,6 +56,7 @@ def templates_view(request):
     if 'user_id' not in request.session:
         return redirect('accounts:login')
 
+
     user = get_current_user(request)
 
     # Ensure this user has a Profile row (auto-create on first visit)
@@ -171,6 +172,14 @@ def set_theme_view(request):
     profile.save()
 
     return redirect('dashboard:templates_dashboard')
+    profile = get_profile(user)
+
+    slug = request.POST.get('theme_slug')
+    theme = get_object_or_404(Theme, slug=slug, is_active=True)
+    profile.theme = theme
+    profile.save()
+
+    return redirect('dashboard:templates_dashboard')
 
 
 # ── Publications ──────────────────────────────────────────────────────────
@@ -219,6 +228,9 @@ def delete_publication(request, pub_id):
     pub     = get_object_or_404(Publication, id=pub_id, profile=profile)
     pub.delete()
     messages.success(request, 'Publication deleted.')
+    next_url = request.GET.get('next', '')
+    if next_url.startswith('/'):
+        return redirect(next_url)
     next_url = request.GET.get('next', '')
     if next_url.startswith('/'):
         return redirect(next_url)
@@ -271,6 +283,9 @@ def delete_teaching(request, teach_id):
     teach   = get_object_or_404(Teaching, id=teach_id, profile=profile)
     teach.delete()
     messages.success(request, 'Course deleted.')
+    next_url = request.GET.get('next', '')
+    if next_url.startswith('/'):
+        return redirect(next_url)
     next_url = request.GET.get('next', '')
     if next_url.startswith('/'):
         return redirect(next_url)
@@ -398,6 +413,9 @@ def edit_profile(request):
             cl_formset.save()
             messages.success(request, 'Profile updated successfully!')
             return redirect('dashboard:main_dashboard')
+
+    publications = Publication.objects.filter(profile=profile)
+    teachings = Teaching.objects.filter(profile=profile)
 
     return render(request, 'dashboard/profile.html', {
         'form'         : profile_form,

@@ -8,7 +8,6 @@ import re
 
 from django.db import models
 from django.utils.text import slugify
-
 from accounts.models import User
 
 
@@ -160,7 +159,6 @@ class Teaching(models.Model):
     description = models.TextField(blank=True)
     syllabus_link = models.URLField(blank=True, null=True)
     semester = models.CharField(max_length=45, blank=True)
-
     def __str__(self):
         return self.course_name
 

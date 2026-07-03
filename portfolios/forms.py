@@ -5,8 +5,16 @@ from .models import Profile, Publication, Teaching,ContactLink,Education
 
 # ── 1. Personal Info ─────────────────────────────────────────────────────
 class ProfileForm(forms.ModelForm):
+    profile_picture = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': 'image/*',
+        })
+    )
+
     class Meta:
-        model  = Profile
+        model = Profile
         fields = [
             'full_name', 'academic_title', 'institution',
             'field_of_study', 'bio', 'profile_image',
@@ -15,19 +23,28 @@ class ProfileForm(forms.ModelForm):
         widgets = {
             'full_name': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'e.g. Dr. Sarah Johnson'
+                'placeholder': 'e.g. Dr. Sarah Johnson',
+                'required': True,
             }),
             'academic_title': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'e.g. Associate Professor'
+                'placeholder': 'e.g. Associate Professor',
+                'required': True,
             }),
             'institution': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'e.g. MIT'
+                'placeholder': 'e.g. MIT',
+                'required': True,
             }),
             'field_of_study': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'e.g. Machine Learning, NLP'
+                'placeholder': 'e.g. Machine Learning, NLP',
+                'required': True,
+            }),
+            'tagline': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. Associate Professor of CS',
+                'required': False,
             }),
             'bio': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -38,13 +55,36 @@ class ProfileForm(forms.ModelForm):
            
             'google_scholar': forms.URLInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'https://scholar.google.com/...'
+                'placeholder': 'https://scholar.google.com/...',
+                'required': False,
             }),
             'research_gate': forms.URLInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'https://www.researchgate.net/...'
+                'placeholder': 'https://www.researchgate.net/...',
+                'required': False,
+            }),
+            'research_interests': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'e.g. NLP, Computer Vision, Responsible AI',
+                'required': False,
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name in ['full_name', 'academic_title', 'institution', 'field_of_study', 'bio']:
+            if field_name in self.fields:
+                self.fields[field_name].required = True
+
+    def save(self, commit=True):
+        profile = super().save(commit=False)
+        picture = self.cleaned_data.get('profile_picture')
+        if picture:
+            profile.profile_image = picture
+        if commit:
+            profile.save()
+        return profile
 
 
 # ── 2. Publication ───────────────────────────────────────────────────────
@@ -57,8 +97,9 @@ class PublicationForm(forms.ModelForm):
         ]
         widgets = {
             'title': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Publication title'
+                'class': 'form-control pub-required',
+                'placeholder': 'Publication title',
+                'required': True,
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -87,8 +128,9 @@ class TeachingForm(forms.ModelForm):
         fields = ['course_name', 'description', 'syllabus_link', 'semester']
         widgets = {
             'course_name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'e.g. Machine Learning 101'
+                'class': 'form-control teach-required',
+                'placeholder': 'e.g. Machine Learning 101',
+                'required': True,
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control',

@@ -4,10 +4,11 @@ from . import views
 app_name = 'dashboard'
 
 urlpatterns = [
-    # Dashboard pages
-    path('home/',       views.dashboard_view,  name='main_dashboard'),
-    path('templates/',  views.templates_view,  name='templates_dashboard'),
-    path('settings/',   views.settings_view,   name='setting_dashboard'),
+    path('home/', views.dashboard_view, name='main_dashboard'),
+    path('templates/', views.templates_view, name='templates_dashboard'),
+    path('settings/', views.settings_view, name='setting_dashboard'),
+
+    path('templates/set/', views.set_theme_view, name='set_theme_dashboard'),
     path('profile/edit/', views.edit_profile,  name='edit_profile'), 
 
     # Publications
