@@ -9,7 +9,7 @@ from portfolios.models import Theme, Profile, Publication, Teaching, Education, 
 
 from .forms import AccountSettingsForm
 import bcrypt
-
+from django.db.models import Q
 
 
 def get_current_user(request):
@@ -422,4 +422,45 @@ def edit_profile(request):
         'edu_formset'  : edu_formset,
         'cl_formset'   : cl_formset,
         'profile'      : profile,
+    })
+
+
+
+
+
+
+def search_dashboard(request):
+    query = request.GET.get('q', '')
+    
+    # الحصول على البروفايل الخاص بالمستخدم الحالي
+    # افترضت هنا أن لديك دالة get_user_and_profile أو تستخدمين request.user.profile
+    _, profile = get_user_and_profile(request) 
+
+    results = {
+        'publications': [],
+        'teaching': [],
+        'education': [],
+    }
+    
+    if query:
+        # البحث مع حصر النتائج في بروفايل المستخدم فقط
+        results['publications'] = Publication.objects.filter(
+            profile=profile, 
+            title__icontains=query
+        )
+        
+        results['teaching'] = Teaching.objects.filter(
+            profile=profile, 
+            course_name__icontains=query
+        )
+        
+        results['education'] = Education.objects.filter(
+            profile=profile, 
+            degree__icontains=query
+        )
+
+    return render(request, 'dashboard/search_results.html', {
+        'results': results,
+        'query': query,
+        'profile': profile # تمرير البروفايل ليبقى الـ Sidebar يعمل
     })
