@@ -199,6 +199,16 @@ class EducationForm(forms.ModelForm):
         }
 
 
+    def clean(self):
+        cleaned_data = super().clean()
+        start = cleaned_data.get("start_year")
+        end = cleaned_data.get("end_year")
+        if end and start and end < start:
+            self.add_error("end_year", "End year cannot be before start year.")
+        return cleaned_data
+
+
+
 # ── 5. ContactLink ────────────────────────────────────────────────────────
 class ContactLinkForm(forms.ModelForm):
     class Meta:
