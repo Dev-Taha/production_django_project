@@ -15,11 +15,13 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Profile
+        # added tagline,research_interests
         fields = [
-            'full_name', 'academic_title', 'institution',
-            'field_of_study', 'bio', 'profile_image',
-            'google_scholar', 'research_gate'
+        'full_name', 'academic_title', 'institution',
+        'field_of_study', 'tagline', 'bio', 'profile_image',
+        'google_scholar', 'research_gate', 'research_interests'
         ]
+
         widgets = {
             'full_name': forms.TextInput(attrs={
                 'class': 'form-control',
