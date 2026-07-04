@@ -425,15 +425,9 @@ def edit_profile(request):
     })
 
 
-
-
-
-
 def search_dashboard(request):
     query = request.GET.get('q', '')
     
-    # الحصول على البروفايل الخاص بالمستخدم الحالي
-    # افترضت هنا أن لديك دالة get_user_and_profile أو تستخدمين request.user.profile
     _, profile = get_user_and_profile(request) 
 
     results = {
@@ -459,8 +453,8 @@ def search_dashboard(request):
             degree__icontains=query
         )
 
-    return render(request, 'dashboard/search_results.html', {
+    return render(request, 'dashboard/dashboard.html', {
         'results': results,
         'query': query,
-        'profile': profile # تمرير البروفايل ليبقى الـ Sidebar يعمل
+        'profile': profile 
     })
