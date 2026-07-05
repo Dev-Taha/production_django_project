@@ -124,6 +124,7 @@
                         <div id="edu-container">
                             {% for form in education_formset.forms %}
                             <div class="edu-row">
+                                {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
                                 <button type="button" class="remove-row-btn"
                                     onclick="this.closest('.edu-row').remove(); updateStepButtons();"><i
                                         class="bi bi-trash"></i></button>
@@ -318,8 +319,9 @@
                     </div>
                     <div class="card-footer bg-white border-top d-flex justify-content-between py-3 px-4">
                         <button type="button" class="btn btn-outline-secondary px-4" data-wizard-prev="6">Back</button>
-                        <button type="submit" class="btn btn-primary px-4" id="go-step3-btn" disabled>Submit &
-                            Continue</button>
+                        
+                        <a href="{% url 'portfolios:onboarding_three' %}" type="submit" class="btn btn-primary px-4" id="go-step3-btn">Submit &
+                            Continue</a>
                     </div>
                 </section>
 

@@ -500,7 +500,7 @@ function sectionValid(idx) {
     const sec = document.getElementById('section-' + idx);
     if (!sec) return true;
     let ok = true;
-    sec.querySelectorAll('input[required], textarea[required], input.pub-required, textarea.pub-required').forEach(el => {
+    sec.querySelectorAll('input[required], textarea[required]').forEach(el => {
         const value = el.type === 'checkbox' || el.type === 'radio' ? el.checked : el.value.trim();
         if (!value) {
             el.classList.add('is-invalid');
@@ -546,13 +546,15 @@ function updateProgress() {
 }
 
 function checkAllDone() {
-    const btn = document.getElementById('go-step3-btn');
-    if (!btn) return;
-    btn.disabled = !sectionDone.every(Boolean);
+    const continueBtn = document.getElementById('continue-btn');
+    if (!continueBtn) return;
+    continueBtn.classList.toggle('disabled-btn', !sectionDone.every(Boolean));
+    continueBtn.classList.toggle('enabled-btn', sectionDone.every(Boolean));
+    continueBtn.setAttribute('aria-disabled', sectionDone.every(Boolean) ? 'false' : 'true');
 }
 
 function getSectionRequiredFields(section) {
-    return section.querySelectorAll('input[required], textarea[required], select[required], input.pub-required, textarea.pub-required');
+    return section.querySelectorAll('input[required], textarea[required], select[required]');
 }
 
 function updateStepButtons() {
@@ -579,32 +581,14 @@ function updateFinalContactState() {
     const research = document.querySelector('input[name="research_gate"]');
     const submitBtn = document.getElementById('go-step3-btn');
     const continueBtn = document.getElementById('continue-btn');
-    const isValid = Boolean(scholar?.value.trim() || research?.value.trim());
-
+    // Final contact fields are optional; enable submit regardless
     if (submitBtn) {
-        submitBtn.disabled = !isValid;
+        submitBtn.disabled = false;
     }
-
-    const finalIndex = TOTAL > 0 ? TOTAL - 1 : null;
-    const dots = document.querySelectorAll('.tracker-dot');
-    const dot = (finalIndex !== null && dots[finalIndex]) ? dots[finalIndex] : null;
-
-    if (dot) {
-        if (isValid) {
-            dot.classList.add('done');
-            dot.innerHTML = '<i class="bi bi-check-lg" style="font-size:.65rem;"></i>';
-            if (finalIndex !== null) sectionDone[finalIndex] = true;
-        } else {
-            dot.classList.remove('done');
-            dot.innerHTML = '';
-            if (finalIndex !== null) sectionDone[finalIndex] = false;
-        }
-    }
-
     if (continueBtn) {
-        continueBtn.classList.toggle('disabled-btn', !isValid);
-        continueBtn.classList.toggle('enabled-btn', isValid);
-        continueBtn.setAttribute('aria-disabled', isValid ? 'false' : 'true');
+        continueBtn.classList.remove('disabled-btn');
+        continueBtn.classList.add('enabled-btn');
+        continueBtn.setAttribute('aria-disabled', 'false');
     }
 
     updateProgress();
@@ -612,7 +596,7 @@ function updateFinalContactState() {
 }
 
 function syncValidation() {
-    document.querySelectorAll('input[required], textarea[required], input.pub-required, textarea.pub-required').forEach(el => {
+    document.querySelectorAll('input[required], textarea[required]').forEach(el => {
         el.removeEventListener('input', updateStepButtons);
         el.removeEventListener('change', updateStepButtons);
         el.addEventListener('input', () => {
@@ -733,6 +717,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     syncValidation();
+
+    // Debug: log form data when submit is clicked to help diagnose client-side issues
+    const step2Form = document.getElementById('step2-form');
+    const submitBtn = document.getElementById('go-step3-btn');
+    if (submitBtn && step2Form) {
+        submitBtn.addEventListener('click', (e) => {
+            try {
+                console.log('SUBMIT CLICKED', new FormData(step2Form));
+            } catch (err) {
+                console.log('SUBMIT CLICKED - could not build FormData', err);
+            }
+        });
+    }
 
     const addPubButton = document.querySelector('[data-add-pub]');
     if (addPubButton) addPubButton.addEventListener('click', addPub);

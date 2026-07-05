@@ -99,9 +99,8 @@ class PublicationForm(forms.ModelForm):
         ]
         widgets = {
             'title': forms.TextInput(attrs={
-                'class': 'form-control pub-required',
+                'class': 'form-control',
                 'placeholder': 'Publication title',
-                'required': True,
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -121,6 +120,12 @@ class PublicationForm(forms.ModelForm):
                 'type' : 'date'
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make publication title optional so onboarding does not block
+        if 'title' in self.fields:
+            self.fields['title'].required = False
 
 
 # ── 3. Teaching ──────────────────────────────────────────────────────────
@@ -231,6 +236,11 @@ class ContactLinkForm(forms.ModelForm):
             'url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': "https://... (optional)"}),
             'link_type': forms.Select(attrs={'class': 'form-select'}),
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make contact link fields optional so users can skip adding any
+        for fname in self.fields:
+            self.fields[fname].required = False
 # ── FormSets ──────────────────────────────────────────────────────────────
 PublicationFormSet = inlineformset_factory(
     Profile, Publication,

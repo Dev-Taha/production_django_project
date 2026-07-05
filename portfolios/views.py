@@ -28,6 +28,7 @@ from services.ai_extraction import (
     save_extracted_data,
 )
 from .models import Profile, Publication, Teaching, Theme
+from django.contrib import messages
 from .forms import ProfileForm, PublicationForm, TeachingForm, EducationFormSet
 
 logger = logging.getLogger(__name__)
@@ -211,6 +212,25 @@ def onboarding_two(request):
                 extra_teaching.save()
 
             return redirect('portfolios:onboarding_three')
+        else:
+            # Provide a clear message when validation fails so the user isn't silently returned
+            messages.error(request, 'There was an error saving your information. Please review the highlighted fields and try again.')
+            try:
+                logger.error('onboarding_two POST validation failed; profile_form.errors=%s', profile_form.errors.as_json())
+            except Exception:
+                logger.error('onboarding_two POST: could not serialize profile_form.errors')
+            try:
+                logger.error('publication_form.errors=%s', publication_form.errors.as_json())
+            except Exception:
+                logger.error('onboarding_two POST: could not serialize publication_form.errors')
+            try:
+                logger.error('teaching_form.errors=%s', teaching_form.errors.as_json())
+            except Exception:
+                logger.error('onboarding_two POST: could not serialize teaching_form.errors')
+            try:
+                logger.error('education_formset.errors=%s', json.dumps(education_formset.errors))
+            except Exception:
+                logger.error('onboarding_two POST: could not serialize education_formset.errors')
     else:
         profile_form = ProfileForm(instance=profile)
         publication_form = PublicationForm()
