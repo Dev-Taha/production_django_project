@@ -358,6 +358,7 @@ function initializeOnboarding2FromSession() {
         }
     }
 
+    const researchEntries = Array.isArray(extracted.research_interests_entries) ? extracted.research_interests_entries : [];
     const filledCount = [
         extracted.profile.full_name,
         extracted.profile.academic_title,
@@ -369,10 +370,10 @@ function initializeOnboarding2FromSession() {
         extracted.profile.research_gate,
         extracted.profile.research_interests,
     ].filter(Boolean).length +
-        extracted.publications.filter(item => item.title).length +
-        extracted.teaching.filter(item => item.course_name).length +
-        extracted.education.filter(item => item.degree || item.institution).length +
-        extracted.research_interests_entries.filter(item => item.title).length;
+        (Array.isArray(extracted.publications) ? extracted.publications.filter(item => item.title).length : 0) +
+        (Array.isArray(extracted.teaching) ? extracted.teaching.filter(item => item.course_name).length : 0) +
+        (Array.isArray(extracted.education) ? extracted.education.filter(item => item.degree || item.institution).length : 0) +
+        researchEntries.filter(item => item.title).length;
 
     showAutoFillToast(`Auto-filled ${filledCount} fields ✅`);
 }
@@ -615,9 +616,11 @@ function updateProgress() {
 function checkAllDone() {
     const continueBtn = document.getElementById('continue-btn');
     if (!continueBtn) return;
-    continueBtn.classList.toggle('disabled-btn', !sectionDone.every(Boolean));
-    continueBtn.classList.toggle('enabled-btn', sectionDone.every(Boolean));
-    continueBtn.setAttribute('aria-disabled', sectionDone.every(Boolean) ? 'false' : 'true');
+    const allDone = sectionDone.every(Boolean);
+    continueBtn.classList.toggle('disabled-btn', !allDone);
+    continueBtn.classList.toggle('enabled-btn', allDone);
+    continueBtn.disabled = !allDone;
+    continueBtn.setAttribute('aria-disabled', allDone ? 'false' : 'true');
 }
 
 function getSectionRequiredFields(section) {
@@ -644,21 +647,10 @@ function updateStepButtons() {
 }
 
 function updateFinalContactState() {
-    const scholar = document.querySelector('input[name="google_scholar"]');
-    const research = document.querySelector('input[name="research_gate"]');
     const submitBtn = document.getElementById('go-step3-btn');
-    const continueBtn = document.getElementById('continue-btn');
-    // Final contact fields are optional; enable submit regardless
     if (submitBtn) {
         submitBtn.disabled = false;
     }
-    if (continueBtn) {
-        continueBtn.classList.remove('disabled-btn');
-        continueBtn.classList.add('enabled-btn');
-        continueBtn.setAttribute('aria-disabled', 'false');
-    }
-
-    updateProgress();
     checkAllDone();
 }
 

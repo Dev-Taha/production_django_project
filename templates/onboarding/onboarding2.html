@@ -48,8 +48,9 @@
 {% block step2_active %}active{% endblock step2_active %}
 
 {% block button %}
-<a href="{% url 'portfolios:onboarding_three' %}" class="wizard-continue-btn disabled-btn mt-0 py-2 px-4 rounded-3"
-    style="border-radius: 0.5rem !important; font-size: 1rem; font-weight: 600;" id="continue-btn">Next Step</a>
+<button type="submit" form="step2-form" class="btn btn-primary fw-semibold px-4 py-2" id="continue-btn" disabled>
+    Continue
+</button>
 {% endblock button %}
 
 {% block step_content %}

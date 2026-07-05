@@ -112,3 +112,56 @@ class OnboardingTwoTemplateTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Please complete the missing 'Start Year'")
+
+    def test_invalid_education_post_preserves_formset_data(self):
+        user = User.objects.create(first_name="Test", last_name="User", email="test4@example.com")
+        session = self.client.session
+        session["user_id"] = user.id
+        session.save()
+
+        response = self.client.post(
+            reverse("portfolios:onboarding_two"),
+            {
+                "full_name": "Test User",
+                "academic_title": "Dr.",
+                "institution": "Test University",
+                "field_of_study": "Computer Science",
+                "bio": "A short bio",
+                "tagline": "",
+                "google_scholar": "",
+                "research_gate": "",
+                "research_interests": "",
+                "title": "",
+                "description": "",
+                "pdf_link": "",
+                "github_link": "",
+                "publication_date": "",
+                "course_name": "",
+                "semester": "",
+                "syllabus_link": "",
+                "education_entries-TOTAL_FORMS": "2",
+                "education_entries-INITIAL_FORMS": "0",
+                "education_entries-MAX_NUM_FORMS": "1000",
+                "education_entries-0-degree": "PhD",
+                "education_entries-0-field_of_study": "Computer Science",
+                "education_entries-0-institution": "MIT",
+                "education_entries-0-start_year": "2020",
+                "education_entries-0-end_year": "2024",
+                "education_entries-0-description": "Dissertation",
+                "education_entries-0-honor": "Summa Cum Laude",
+                "education_entries-0-DELETE": "",
+                "education_entries-1-degree": "MSc",
+                "education_entries-1-field_of_study": "AI",
+                "education_entries-1-institution": "Stanford",
+                "education_entries-1-start_year": "",
+                "education_entries-1-end_year": "2021",
+                "education_entries-1-description": "Research assistant",
+                "education_entries-1-honor": "",
+                "education_entries-1-DELETE": "",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "education_entries-1-degree")
+        self.assertContains(response, "value=\"MSc\"")
+        self.assertContains(response, "Please complete the missing 'Start Year'")
