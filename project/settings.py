@@ -110,7 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
-TOGETHER_MODEL = "OpenAI GPT-OSS 120B"
+TOGETHER_MODEL = "openai/gpt-oss-120b"
 
 
 # Internationalization
@@ -151,3 +151,30 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '[%(levelname)s] %(asctime)s %(name)s: %(message)s',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}

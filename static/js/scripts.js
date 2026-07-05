@@ -96,6 +96,246 @@ function selectCard(card) {
     }
 }
 
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+function showCvScanning(message) {
+    document.getElementById('cv-dropzone')?.classList.add('d-none');
+    document.getElementById('cv-scanning')?.classList.remove('d-none');
+    const msg = document.getElementById('cv-scan-message');
+    if (msg) msg.textContent = message;
+}
+
+function hideCvScanning() {
+    document.getElementById('cv-dropzone')?.classList.remove('d-none');
+    document.getElementById('cv-scanning')?.classList.add('d-none');
+    document.getElementById('cv-scan-error')?.classList.add('d-none');
+    document.getElementById('cv-retry-btn')?.classList.add('d-none');
+}
+
+function setCvError(message) {
+    const errorBox = document.getElementById('cv-scan-error');
+    if (errorBox) {
+        errorBox.textContent = message;
+        errorBox.classList.remove('d-none');
+    }
+    const retry = document.getElementById('cv-retry-btn');
+    if (retry) retry.classList.remove('d-none');
+}
+
+function showAutoFillToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'position-fixed bottom-0 end-0 m-4 p-3 rounded-3 bg-success text-white shadow';
+    toast.style.zIndex = '9999';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+}
+
+function setFormValue(selector, value) {
+    const el = document.querySelector(selector);
+    if (!el || value == null) return;
+    el.value = value;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function addPublicationRow(item = {}) {
+    const c = document.getElementById('pub-container');
+    if (!c) return;
+    const div = document.createElement('div');
+    div.className = 'pub-row';
+    div.innerHTML = `
+        <button type="button" class="remove-row-btn" onclick="this.closest('.pub-row').remove(); updateStepButtons();"><i class="bi bi-trash"></i></button>
+        <div class="row g-3">
+            <div class="col-md-8">
+                <label class="form-label fw-semibold small">Title <span class="text-danger">*</span></label>
+                <input type="text" name="pub_title[]" class="form-control pub-required" placeholder="Publication title" value="${item.title || ''}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold small">Date</label>
+                <input type="date" name="pub_date[]" class="form-control" value="${item.publication_date || ''}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">PDF Link</label>
+                <input type="url" name="pub_pdf[]" class="form-control" placeholder="https://..." value="${item.pdf_link || ''}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">GitHub Link</label>
+                <input type="url" name="pub_github[]" class="form-control" placeholder="https://github.com/..." value="${item.github_link || ''}">
+            </div>
+        </div>`;
+    c.appendChild(div);
+    syncValidation();
+}
+
+function addTeachingRow(item = {}) {
+    const c = document.getElementById('teach-container');
+    if (!c) return;
+    const div = document.createElement('div');
+    div.className = 'teach-row';
+    div.innerHTML = `
+        <button type="button" class="remove-row-btn" onclick="this.closest('.teach-row').remove(); updateStepButtons();"><i class="bi bi-trash"></i></button>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">Course Name <span class="text-danger">*</span></label>
+                <input type="text" name="course_name[]" class="form-control teach-required" placeholder="e.g. Machine Learning 101" value="${item.course_name || ''}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">Semester</label>
+                <input type="text" name="semester[]" class="form-control" placeholder="e.g. Fall 2024" value="${item.semester || ''}">
+            </div>
+            <div class="col-md-8">
+                <label class="form-label fw-semibold small">Description</label>
+                <textarea name="course_desc[]" class="form-control" rows="2" placeholder="Course description…">${item.description || ''}</textarea>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold small">Syllabus Link</label>
+                <input type="url" name="syllabus_link[]" class="form-control" placeholder="https://..." value="${item.syllabus_link || ''}">
+            </div>
+        </div>`;
+    c.appendChild(div);
+    syncValidation();
+}
+
+function initializeOnboarding2FromSession() {
+    const rawData = sessionStorage.getItem('cv_extracted_data');
+    if (!rawData) return;
+    let extracted;
+    try {
+        extracted = JSON.parse(rawData);
+    } catch (err) {
+        return;
+    }
+    sessionStorage.removeItem('cv_extracted_data');
+
+    setFormValue('input[name="full_name"]', extracted.profile.full_name || '');
+    setFormValue('input[name="academic_title"]', extracted.profile.academic_title || '');
+    setFormValue('input[name="institution"]', extracted.profile.institution || '');
+    setFormValue('input[name="field_of_study"]', extracted.profile.field_of_study || '');
+    setFormValue('input[name="tagline"]', extracted.profile.tagline || '');
+    setFormValue('textarea[name="bio"]', extracted.profile.bio || '');
+    setFormValue('input[name="google_scholar"]', extracted.profile.google_scholar || '');
+    setFormValue('input[name="research_gate"]', extracted.profile.research_gate || '');
+
+    if (extracted.profile.research_interests) {
+        tags = extracted.profile.research_interests.split(/[\n,]+/).map(t => t.trim()).filter(Boolean);
+        renderTags();
+    }
+
+    if (Array.isArray(extracted.publications) && extracted.publications.length) {
+        const first = extracted.publications[0];
+        setFormValue('input[name="title"]', first.title || '');
+        setFormValue('input[name="publication_date"]', first.publication_date || '');
+        setFormValue('input[name="pdf_link"]', first.pdf_link || '');
+        setFormValue('input[name="github_link"]', first.github_link || '');
+        extracted.publications.slice(1).forEach(addPublicationRow);
+    }
+
+    if (Array.isArray(extracted.teaching) && extracted.teaching.length) {
+        const first = extracted.teaching[0];
+        setFormValue('input[name="course_name"]', first.course_name || '');
+        setFormValue('input[name="semester"]', first.semester || '');
+        setFormValue('textarea[name="description"]', first.description || '');
+        setFormValue('input[name="syllabus_link"]', first.syllabus_link || '');
+        extracted.teaching.slice(1).forEach(addTeachingRow);
+    }
+
+    const filledCount = [
+        extracted.profile.full_name,
+        extracted.profile.academic_title,
+        extracted.profile.institution,
+        extracted.profile.field_of_study,
+        extracted.profile.tagline,
+        extracted.profile.bio,
+        extracted.profile.google_scholar,
+        extracted.profile.research_gate,
+        extracted.profile.research_interests,
+    ].filter(Boolean).length +
+        extracted.publications.filter(item => item.title).length +
+        extracted.teaching.filter(item => item.course_name).length +
+        extracted.education.filter(item => item.degree || item.institution).length +
+        extracted.research_interests_entries.filter(item => item.title).length;
+
+    showAutoFillToast(`Auto-filled ${filledCount} fields ✅`);
+}
+
+function pollCvStatus(taskId) {
+    const messages = [
+        'Extracting your skills...',
+        'Extracting publications...',
+        'Analyzing academic background...',
+        'Auto-filling your data...'
+    ];
+    let index = 0;
+    const interval = setInterval(async () => {
+        showCvScanning(messages[index % messages.length]);
+        index += 1;
+        try {
+            const response = await fetch(`/api/onboarding/cv-status/${taskId}/`, {
+                credentials: 'same-origin',
+            });
+            if (!response.ok) {
+                throw new Error('Failed to connect to the server');
+            }
+            const result = await response.json();
+            if (result.status === 'completed') {
+                clearInterval(interval);
+                sessionStorage.setItem('cv_extracted_data', JSON.stringify(result.data));
+                window.location.href = '/portfolios/onboarding-two/';
+                return;
+            }
+            if (result.status === 'failed') {
+                clearInterval(interval);
+                setCvError(result.error || 'Failed to analyze the file. Please try again.');
+            }
+        } catch (err) {
+            clearInterval(interval);
+            setCvError(err.message || 'Failed to connect to the analysis server.');
+        }
+    }, 1500);
+}
+
+async function uploadCvFile(file) {
+    if (!file) return;
+    const allowed = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowed.includes(file.type) && !file.name.toLowerCase().endsWith('.docx')) {
+        setCvError('Unsupported file type. Please upload PDF or DOCX.');
+        return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+        setCvError('File size exceeds 10MB.');
+        return;
+    }
+    showCvScanning('Uploading the file to the server...');
+    const formData = new FormData();
+    formData.append('cv_file', file);
+    try {
+        const csrftoken = getCookie('csrftoken');
+        const response = await fetch('/api/onboarding/upload-cv/', {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin',
+            headers: csrftoken ? { 'X-CSRFToken': csrftoken } : {},
+        });
+        if (!response.ok) {
+            const payload = await response.json().catch(() => null);
+            throw new Error(payload?.error || 'Upload failed.');
+        }
+        const data = await response.json();
+        if (data.task_id) {
+            pollCvStatus(data.task_id);
+        } else {
+            throw new Error('No task ID received.');
+        }
+    } catch (err) {
+        setCvError(err.message || 'An error occurred during upload.');
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const wizardCards = document.querySelectorAll('.wizard-card');
     wizardCards.forEach(card => {
@@ -103,6 +343,38 @@ document.addEventListener("DOMContentLoaded", () => {
             selectCard(this);
         });
     });
+
+    const dropzone = document.getElementById('cv-dropzone');
+    const fileInput = document.getElementById('cv-file-input');
+    const retryButton = document.getElementById('cv-retry-btn');
+    if (dropzone) {
+        dropzone.addEventListener('click', () => fileInput?.click());
+        dropzone.addEventListener('dragover', event => {
+            event.preventDefault();
+            dropzone.classList.add('drag-over');
+        });
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('drag-over');
+        });
+        dropzone.addEventListener('drop', event => {
+            event.preventDefault();
+            dropzone.classList.remove('drag-over');
+            const file = event.dataTransfer.files[0];
+            if (file) uploadCvFile(file);
+        });
+    }
+    if (fileInput) {
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files?.[0];
+            if (file) uploadCvFile(file);
+        });
+    }
+    if (retryButton) {
+        retryButton.addEventListener('click', () => {
+            document.getElementById('cv-scan-error')?.classList.add('d-none');
+            hideCvScanning();
+        });
+    }
 });
 
 
@@ -376,8 +648,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const addCourseButton = document.querySelector('[data-add-course]');
     if (addCourseButton) addCourseButton.addEventListener('click', addCourse);
 
-    // Init wizard on onboarding2 page
+    // Init wizard on onboarding2 page and autofill if the CV extractor returned data.
     if (document.getElementById('step2-form')) {
+        initializeOnboarding2FromSession();
         showSection(0);
         updateStepButtons();
     }
@@ -435,7 +708,7 @@ function addCourse() {
             </div>
             <div class="col-md-6">
                 <label class="form-label fw-semibold small">Semester</label>
-                <input type="text" name="teachingscol[]" class="form-control" placeholder="e.g. Fall 2024">
+                <input type="text" name="semester[]" class="form-control" placeholder="e.g. Fall 2024">
             </div>
             <div class="col-md-8">
                 <label class="form-label fw-semibold small">Description</label>
@@ -511,19 +784,19 @@ function refreshPreview() {
 
 
 
-    // Filter function — runs every time the user types in the filter input.
-    // Steps:
-    // 1. Get the typed text and convert to lowercase
-    // 2. Loop through every <tr class="asset-row">
-    // 3. Compare the typed text against data-title on each row
-    // 4. Show the row if it matches, hide it if it doesn't
-    // 5. If nothing matches at all, show the "No results found" row
+// Filter function — runs every time the user types in the filter input.
+// Steps:
+// 1. Get the typed text and convert to lowercase
+// 2. Loop through every <tr class="asset-row">
+// 3. Compare the typed text against data-title on each row
+// 4. Show the row if it matches, hide it if it doesn't
+// 5. If nothing matches at all, show the "No results found" row
 
 function filterAssets(query) {
-    const q     = query.toLowerCase().trim();  //  the search text
-    const rows  = document.querySelectorAll('.asset-row');  // all table rows
+    const q = query.toLowerCase().trim();  //  the search text
+    const rows = document.querySelectorAll('.asset-row');  // all table rows
     const noRes = document.getElementById('no-results');    // the "no results" row
-    let   found = 0;  // counter for how many rows are visible
+    let found = 0;  // counter for how many rows are visible
 
     rows.forEach(row => {
         // data-title holds the lowercase title set  ("machine learning 101")

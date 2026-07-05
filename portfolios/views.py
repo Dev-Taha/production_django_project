@@ -4,21 +4,36 @@ portfolios/onboarding.py
 Multi-step onboarding flow for newly registered users: collect profile info,
 publications, and teaching load, then let them pick a starting template.
 """
+import io
 import json
+import logging
+import threading
+import traceback
+import uuid
 from pathlib import Path
 from types import SimpleNamespace
 
 from django.conf import settings
+from django.core.files.base import ContentFile
 from django.db import OperationalError
-from django.http import Http404
+from django.http import JsonResponse, Http404, HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.urls import reverse
 
 from accounts.models import User
-
+from services.ai_extraction import (
+    extract_text_from_cv_file,
+    extract_cv_data,
+    save_extracted_data,
+)
 from .models import Profile, Publication, Teaching, Theme
 from .forms import ProfileForm, PublicationForm, TeachingForm
+
+logger = logging.getLogger(__name__)
+
+CV_TASKS: dict[str, dict] = {}
+CV_TASKS_LOCK = threading.Lock()
 
 SECTIONS = [
     'Personal Info', 'Professional Bio', 'Research Interests',
@@ -40,6 +55,97 @@ def get_profile(user):
 
 def onboarding_one(request):
     return render(request, 'onboarding/onboarding1.html')
+
+
+def _start_cv_task(profile, file_obj, filename):
+    task_id = str(uuid.uuid4())
+    with CV_TASKS_LOCK:
+        CV_TASKS[task_id] = {"status": "processing", "data": None, "error": None}
+
+    file_bytes = file_obj.read()
+    mirror_file = io.BytesIO(file_bytes)
+    mirror_file.name = filename
+
+    def task():
+        try:
+            text = extract_text_from_cv_file(io.BytesIO(file_bytes), filename, file_size=len(file_bytes))
+            extracted_json = extract_cv_data(text)
+            profile.cv_file.save(filename, ContentFile(file_bytes), save=True)
+            save_extracted_data(profile, extracted_json)
+            with CV_TASKS_LOCK:
+                CV_TASKS[task_id]["status"] = "completed"
+                CV_TASKS[task_id]["data"] = extracted_json
+        except Exception as exc:
+            logger.error(
+                "CV processing failed for task %s: %s\n%s",
+                task_id,
+                exc,
+                traceback.format_exc(),
+            )
+            with CV_TASKS_LOCK:
+                CV_TASKS[task_id]["status"] = "failed"
+                CV_TASKS[task_id]["error"] = str(exc)
+
+    background_thread = threading.Thread(target=task, daemon=True)
+    background_thread.start()
+    return task_id
+
+
+def upload_cv(request):
+    if request.method != 'POST':
+        return HttpResponseBadRequest('Only POST supported.')
+    if 'user_id' not in request.session:
+        return JsonResponse({'error': 'Authentication required.'}, status=401)
+    if 'cv_file' not in request.FILES:
+        return JsonResponse({'error': 'No file uploaded.'}, status=400)
+
+    file = request.FILES['cv_file']
+    if file.size == 0:
+        return JsonResponse({'error': 'Uploaded file is empty.'}, status=400)
+
+    file_bytes = file.read()
+    if len(file_bytes) == 0:
+        return JsonResponse({'error': 'Uploaded file is empty.'}, status=400)
+    if file.size is not None and len(file_bytes) != file.size:
+        return JsonResponse({'error': 'File upload appears incomplete.'}, status=400)
+
+    extension = file.name.lower().rsplit('.', 1)[-1] if '.' in file.name else ''
+    extension = f".{extension}"
+    if extension == ".pdf":
+        try:
+            from pypdf import PdfReader
+            PdfReader(io.BytesIO(file_bytes))
+        except Exception:
+            return JsonResponse(
+                {'error': 'Unable to open the PDF file. Please verify it is a valid PDF.'},
+                status=400,
+            )
+
+    user = get_current_user(request)
+    profile = get_profile(user)
+    if profile is None:
+        return JsonResponse({'error': 'User profile not found.'}, status=404)
+
+    try:
+        task_id = _start_cv_task(profile, io.BytesIO(file_bytes), file.name)
+        return JsonResponse({'task_id': task_id, 'status': 'processing'})
+    except ValueError as exc:
+        return JsonResponse({'error': str(exc)}, status=400)
+    except Exception as exc:
+        return JsonResponse({'error': 'Failed to start CV processing.'}, status=500)
+
+
+def cv_status(request, task_id):
+    with CV_TASKS_LOCK:
+        task = CV_TASKS.get(task_id)
+    if task is None:
+        return JsonResponse({'error': 'Task not found.'}, status=404)
+    response = {'status': task['status']}
+    if task['status'] == 'completed':
+        response['data'] = task['data']
+    elif task['status'] == 'failed':
+        response['error'] = task['error']
+    return JsonResponse(response)
 
 
 def onboarding_two(request):
@@ -65,7 +171,6 @@ def onboarding_two(request):
             teaching.profile = profile
             teaching.save()
 
-            # Save additional publications from dynamic rows
             pub_titles = request.POST.getlist('pub_title[]')
             pub_dates = request.POST.getlist('pub_date[]')
             pub_pdfs = request.POST.getlist('pub_pdf[]')
@@ -82,9 +187,8 @@ def onboarding_two(request):
                 )
                 extra_pub.save()
 
-            # Save additional courses from dynamic rows
             course_names = request.POST.getlist('course_name[]')
-            course_semesters = request.POST.getlist('teachingscol[]')
+            course_semesters = request.POST.getlist('semester[]')
             course_descs = request.POST.getlist('course_desc[]')
             course_links = request.POST.getlist('syllabus_link[]')
             for idx, name in enumerate(course_names):
@@ -93,7 +197,7 @@ def onboarding_two(request):
                 extra_teaching = Teaching(
                     profile=profile,
                     course_name=name.strip(),
-                    teachingscol=course_semesters[idx] if idx < len(course_semesters) else '',
+                    semester=course_semesters[idx] if idx < len(course_semesters) else '',
                     description=course_descs[idx] if idx < len(course_descs) else '',
                     syllabus_link=course_links[idx] if idx < len(course_links) else '',
                 )
