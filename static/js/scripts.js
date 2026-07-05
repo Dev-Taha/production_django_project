@@ -312,20 +312,44 @@ function initializeOnboarding2FromSession() {
 
     if (Array.isArray(extracted.publications) && extracted.publications.length) {
         const first = extracted.publications[0];
-        setFormValue('input[name="title"]', first.title || '');
-        setFormValue('input[name="publication_date"]', first.publication_date || '');
-        setFormValue('input[name="pdf_link"]', first.pdf_link || '');
-        setFormValue('input[name="github_link"]', first.github_link || '');
-        extracted.publications.slice(1).forEach(addPublicationRow);
+        if (document.querySelector('input[name="publications-0-title"]')) {
+            setFormValue('input[name="publications-0-title"]', first.title || '');
+            setFormValue('input[name="publications-0-publication_date"]', first.publication_date || '');
+            setFormValue('input[name="publications-0-pdf_link"]', first.pdf_link || '');
+            setFormValue('input[name="publications-0-github_link"]', first.github_link || '');
+            extracted.publications.slice(1).forEach(item => {
+                addPub();
+                const rows = document.querySelectorAll('#pub-container .pub-row');
+                const idx = rows.length - 1;
+                setFormValue(`input[name="publications-${idx}-title"]`, item.title || '');
+                setFormValue(`input[name="publications-${idx}-publication_date"]`, item.publication_date || '');
+                setFormValue(`input[name="publications-${idx}-pdf_link"]`, item.pdf_link || '');
+                setFormValue(`input[name="publications-${idx}-github_link"]`, item.github_link || '');
+            });
+        } else {
+            extracted.publications.slice(1).forEach(addPublicationRow);
+        }
     }
 
     if (Array.isArray(extracted.teaching) && extracted.teaching.length) {
         const first = extracted.teaching[0];
-        setFormValue('input[name="course_name"]', first.course_name || '');
-        setFormValue('input[name="semester"]', first.semester || '');
-        setFormValue('textarea[name="description"]', first.description || '');
-        setFormValue('input[name="syllabus_link"]', first.syllabus_link || '');
-        extracted.teaching.slice(1).forEach(addTeachingRow);
+        if (document.querySelector('input[name="teachings-0-course_name"]')) {
+            setFormValue('input[name="teachings-0-course_name"]', first.course_name || '');
+            setFormValue('input[name="teachings-0-semester"]', first.semester || '');
+            setFormValue('textarea[name="teachings-0-description"]', first.description || '');
+            setFormValue('input[name="teachings-0-syllabus_link"]', first.syllabus_link || '');
+            extracted.teaching.slice(1).forEach(item => {
+                addCourse();
+                const rows = document.querySelectorAll('#teach-container .teach-row');
+                const idx = rows.length - 1;
+                setFormValue(`input[name="teachings-${idx}-course_name"]`, item.course_name || '');
+                setFormValue(`input[name="teachings-${idx}-semester"]`, item.semester || '');
+                setFormValue(`textarea[name="teachings-${idx}-description"]`, item.description || '');
+                setFormValue(`input[name="teachings-${idx}-syllabus_link"]`, item.syllabus_link || '');
+            });
+        } else {
+            extracted.teaching.slice(1).forEach(addTeachingRow);
+        }
     }
 
     if (Array.isArray(extracted.education) && extracted.education.length) {
@@ -591,34 +615,50 @@ function prevSection(idx) {
 }
 
 function markDone(idx) {
-    sectionDone[idx] = true;
-    const dot = document.getElementById('dot-' + idx);
-    if (dot) {
-        dot.classList.add('done');
-        dot.innerHTML = '<i class="bi bi-check-lg" style="font-size:.65rem;"></i>';
+    const c = document.getElementById('pub-container');
+    if (!c) return;
+    const totalInput = document.querySelector('input[name="publications-TOTAL_FORMS"]');
+    let index = 0;
+    if (totalInput) index = parseInt(totalInput.value, 10);
+    const empty = document.getElementById('pub-empty')?.innerHTML;
+    if (empty) {
+        const html = empty.replace(/__prefix__/g, index);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'pub-row repeatable-card';
+        wrapper.innerHTML = `<div class="repeatable-card-header"><div class="repeatable-card-title">Publication #${c.querySelectorAll('.pub-row').length + 1}</div><button type="button" class="remove-row-btn" onclick="this.closest('.pub-row').remove(); updateStepButtons(); updateRepeatableSectionTitles();"><i class="bi bi-trash"></i></button></div><div class="row g-3">${html}</div>`;
+        c.appendChild(wrapper);
+        if (totalInput) totalInput.value = index + 1;
+        syncValidation();
+        updateRepeatableSectionTitles();
+        return;
     }
-    updateProgress();
-    checkAllDone();
-}
 
-function updateProgress() {
-    const done = sectionDone.filter(Boolean).length;
-    const pct = Math.round((done / TOTAL) * 100);
-    const bar = document.getElementById('completion-bar');
-    if (bar) {
-        bar.style.width = pct + '%';
-        bar.setAttribute('aria-valuenow', pct);
-    }
-    const pctText = document.getElementById('completion-pct');
-    if (pctText) pctText.textContent = pct + '% complete';
-}
-
-function checkAllDone() {
-    const continueBtn = document.getElementById('continue-btn');
-    if (!continueBtn) return;
-    const allDone = sectionDone.every(Boolean);
-    continueBtn.classList.toggle('disabled-btn', !allDone);
-    continueBtn.classList.toggle('enabled-btn', allDone);
+    const div = document.createElement('div');
+    div.className = 'pub-row';
+    div.id = 'pub-' + pubCount;
+    div.innerHTML = `
+        <button type="button" class="remove-row-btn" onclick="this.closest('.pub-row').remove(); updateStepButtons();"><i class="bi bi-trash"></i></button>
+        <div class="row g-3">
+            <div class="col-md-8">
+                <label class="form-label fw-semibold small">Title <span class="text-danger">*</span></label>
+                <input type="text" name="pub_title[]" class="form-control pub-required" placeholder="Publication title">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold small">Date</label>
+                <input type="date" name="pub_date[]" class="form-control">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">PDF Link</label>
+                <input type="url" name="pub_pdf[]" class="form-control" placeholder="https://...">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">GitHub Link</label>
+                <input type="url" name="pub_github[]" class="form-control" placeholder="https://github.com/...">
+            </div>
+        </div>`;
+    c.appendChild(div);
+    pubCount++;
+    syncValidation();
     continueBtn.disabled = !allDone;
     continueBtn.setAttribute('aria-disabled', allDone ? 'false' : 'true');
 }
@@ -855,6 +895,22 @@ let courseCount = 1;
 function addCourse() {
     const c = document.getElementById('teach-container');
     if (!c) return;
+    const totalInput = document.querySelector('input[name="teachings-TOTAL_FORMS"]');
+    let index = 0;
+    if (totalInput) index = parseInt(totalInput.value, 10);
+    const empty = document.getElementById('teach-empty')?.innerHTML;
+    if (empty) {
+        const html = empty.replace(/__prefix__/g, index);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'teach-row repeatable-card';
+        wrapper.innerHTML = `<div class="repeatable-card-header"><div class="repeatable-card-title">Teaching #${c.querySelectorAll('.teach-row').length + 1}</div><button type="button" class="remove-row-btn" onclick="this.closest('.teach-row').remove(); updateStepButtons(); updateRepeatableSectionTitles();"><i class="bi bi-trash"></i></button></div><div class="row g-3">${html}</div>`;
+        c.appendChild(wrapper);
+        if (totalInput) totalInput.value = index + 1;
+        syncValidation();
+        updateRepeatableSectionTitles();
+        return;
+    }
+
     const div = document.createElement('div');
     div.className = 'teach-row';
     div.id = 'teach-' + courseCount;

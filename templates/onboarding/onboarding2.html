@@ -289,45 +289,48 @@
                             <button type="button" class="btn btn-sm btn-outline-secondary">Fetch from Scholar</button>
                         </div>
                         <div class="card-body p-4">
+                            {% if publication_formset %}
+                            {{ publication_formset.management_form }}
                             <div id="pub-container">
+                                {% for form in publication_formset.forms %}
                                 <div class="pub-row repeatable-card">
+                                    {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
                                     <div class="repeatable-card-header">
-                                        <div class="repeatable-card-title">Publication #1</div>
+                                        <div class="repeatable-card-title">Publication #{{ forloop.counter }}</div>
                                         <button type="button" class="remove-row-btn"
                                             onclick="this.closest('.pub-row').remove(); updateStepButtons(); updateRepeatableSectionTitles();"><i
                                                 class="bi bi-trash"></i></button>
                                     </div>
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label class="form-label fw-semibold small"
-                                                for="{{ publication_form.title.id_for_label }}">Title</label>
-                                            {{ publication_form.title }}
+                                            <label class="form-label fw-semibold small">Title</label>
+                                            {{ form.title }}
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-semibold small"
-                                                for="{{ publication_form.publication_date.id_for_label }}">Publication
-                                                Date</label>
-                                            {{ publication_form.publication_date }}
+                                            <label class="form-label fw-semibold small">Publication Date</label>
+                                            {{ form.publication_date }}
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-semibold small"
-                                                for="{{ publication_form.pdf_link.id_for_label }}">PDF Link</label>
-                                            {{ publication_form.pdf_link }}
+                                            <label class="form-label fw-semibold small">PDF Link</label>
+                                            {{ form.pdf_link }}
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-semibold small"
-                                                for="{{ publication_form.github_link.id_for_label }}">GitHub
-                                                Link</label>
-                                            {{ publication_form.github_link }}
+                                            <label class="form-label fw-semibold small">GitHub Link</label>
+                                            {{ form.github_link }}
                                         </div>
                                     </div>
                                 </div>
+                                {% endfor %}
+                            </div>
+                            <div id="pub-empty" class="d-none">
+                                {{ publication_formset.empty_form.as_p|safe }}
                             </div>
                             <button type="button"
                                 class="btn btn-outline-secondary d-inline-flex align-items-center justify-content-center rounded-3 w-100 mt-4 py-3"
                                 data-add-pub>
                                 <i class="bi bi-plus-lg me-2"></i> Add Another Publication
                             </button>
+                            {% endif %}
                         </div>
                         <div class="card-footer bg-white border-top d-flex justify-content-between py-3 px-4">
                             <button type="button" class="btn btn-outline-secondary px-4"
@@ -343,44 +346,48 @@
                             <p class="text-secondary small mb-0">Document courses and supporting materials.</p>
                         </div>
                         <div class="card-body p-4">
+                            {% if teaching_formset %}
+                            {{ teaching_formset.management_form }}
                             <div id="teach-container">
+                                {% for form in teaching_formset.forms %}
                                 <div class="teach-row repeatable-card">
+                                    {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
                                     <div class="repeatable-card-header">
-                                        <div class="repeatable-card-title">Teaching #1</div>
+                                        <div class="repeatable-card-title">Teaching #{{ forloop.counter }}</div>
                                         <button type="button" class="remove-row-btn"
                                             onclick="this.closest('.teach-row').remove(); updateStepButtons(); updateRepeatableSectionTitles();"><i
                                                 class="bi bi-trash"></i></button>
                                     </div>
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label class="form-label fw-semibold small"
-                                                for="{{ teaching_form.course_name.id_for_label }}">Course Name</label>
-                                            {{ teaching_form.course_name }}
+                                            <label class="form-label fw-semibold small">Course Name</label>
+                                            {{ form.course_name }}
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-semibold small"
-                                                for="{{ teaching_form.semester.id_for_label }}">Semester</label>
-                                            {{ teaching_form.semester }}
+                                            <label class="form-label fw-semibold small">Semester</label>
+                                            {{ form.semester }}
                                         </div>
                                         <div class="col-md-8">
-                                            <label class="form-label fw-semibold small"
-                                                for="{{ teaching_form.description.id_for_label }}">Description</label>
-                                            {{ teaching_form.description }}
+                                            <label class="form-label fw-semibold small">Description</label>
+                                            {{ form.description }}
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label fw-semibold small"
-                                                for="{{ teaching_form.syllabus_link.id_for_label }}">Syllabus
-                                                Link</label>
-                                            {{ teaching_form.syllabus_link }}
+                                            <label class="form-label fw-semibold small">Syllabus Link</label>
+                                            {{ form.syllabus_link }}
                                         </div>
                                     </div>
                                 </div>
+                                {% endfor %}
+                            </div>
+                            <div id="teach-empty" class="d-none">
+                                {{ teaching_formset.empty_form.as_p|safe }}
                             </div>
                             <button type="button"
                                 class="btn btn-outline-secondary d-inline-flex align-items-center justify-content-center rounded-3 w-100 mt-4 py-3"
                                 data-add-course>
                                 <i class="bi bi-plus-lg me-2"></i> Add Another Course
                             </button>
+                            {% endif %}
                         </div>
                         <div class="card-footer bg-white border-top d-flex justify-content-between py-3 px-4">
                             <button type="button" class="btn btn-outline-secondary px-4"

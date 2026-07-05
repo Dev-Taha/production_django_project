@@ -29,7 +29,7 @@ from services.ai_extraction import (
 )
 from .models import Profile, Publication, Teaching, Theme
 from django.contrib import messages
-from .forms import ProfileForm, PublicationForm, TeachingForm, EducationFormSet
+from .forms import ProfileForm, PublicationForm, TeachingForm, EducationFormSet, PublicationFormSet, TeachingFormSet
 
 
 def _form_has_data(form):
@@ -182,26 +182,72 @@ def onboarding_two(request):
 
     if request.method == 'POST':
         profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
-        publication_form = PublicationForm(request.POST)
-        teaching_form = TeachingForm(request.POST)
+
+        # detect if client posted formset management data; if not, fall back to legacy array fields
+        has_pub_formset = any(k.startswith('publications-') for k in request.POST.keys()) or 'publications-TOTAL_FORMS' in request.POST
+        has_teach_formset = any(k.startswith('teachings-') for k in request.POST.keys()) or 'teachings-TOTAL_FORMS' in request.POST
+
+        if has_pub_formset:
+            publication_formset = PublicationFormSet(request.POST, instance=profile)
+            pub_legacy = False
+        else:
+            publication_formset = PublicationFormSet(instance=profile)
+            pub_legacy = True
+
+        if has_teach_formset:
+            teaching_formset = TeachingFormSet(request.POST, instance=profile)
+            teach_legacy = False
+        else:
+            teaching_formset = TeachingFormSet(instance=profile)
+            teach_legacy = True
+
         education_formset = EducationFormSet(request.POST, instance=profile)
 
-        # validate everything; publications/teaching handling stays as-is
-        forms_valid = profile_form.is_valid() and publication_form.is_valid() and teaching_form.is_valid() and education_formset.is_valid()
+        # validate everything (legacy pub/teach counted as valid here)
+        forms_valid = profile_form.is_valid() and (publication_formset.is_valid() if not pub_legacy else True) and (teaching_formset.is_valid() if not teach_legacy else True) and education_formset.is_valid()
         education_error_message = None
 
         if forms_valid:
             profile_form.save()
 
-            if _form_has_data(publication_form):
-                publication = publication_form.save(commit=False)
-                publication.profile = profile
-                publication.save()
+            # Save inline formsets or fall back to legacy array parsing
+            if not pub_legacy:
+                publication_formset.save()
+            else:
+                pub_titles = request.POST.getlist('pub_title[]')
+                pub_dates = request.POST.getlist('pub_date[]')
+                pub_pdfs = request.POST.getlist('pub_pdf[]')
+                pub_githubs = request.POST.getlist('pub_github[]')
+                for idx, title in enumerate(pub_titles):
+                    if not title.strip():
+                        continue
+                    extra_pub = Publication(
+                        profile=profile,
+                        title=title.strip(),
+                        publication_date=pub_dates[idx] if idx < len(pub_dates) else None,
+                        pdf_link=pub_pdfs[idx] if idx < len(pub_pdfs) else '',
+                        github_link=pub_githubs[idx] if idx < len(pub_githubs) else '',
+                    )
+                    extra_pub.save()
 
-            if _form_has_data(teaching_form):
-                teaching = teaching_form.save(commit=False)
-                teaching.profile = profile
-                teaching.save()
+            if not teach_legacy:
+                teaching_formset.save()
+            else:
+                course_names = request.POST.getlist('course_name[]')
+                course_semesters = request.POST.getlist('semester[]')
+                course_descs = request.POST.getlist('course_desc[]')
+                course_links = request.POST.getlist('syllabus_link[]')
+                for idx, name in enumerate(course_names):
+                    if not name.strip():
+                        continue
+                    extra_teaching = Teaching(
+                        profile=profile,
+                        course_name=name.strip(),
+                        semester=course_semesters[idx] if idx < len(course_semesters) else '',
+                        description=course_descs[idx] if idx < len(course_descs) else '',
+                        syllabus_link=course_links[idx] if idx < len(course_links) else '',
+                    )
+                    extra_teaching.save()
 
             # Ignore empty education rows so optional blank entries do not break saving.
             valid_education_forms = [
@@ -211,38 +257,6 @@ def onboarding_two(request):
             if valid_education_forms:
                 education_formset.forms = valid_education_forms
                 education_formset.save()
-
-            pub_titles = request.POST.getlist('pub_title[]')
-            pub_dates = request.POST.getlist('pub_date[]')
-            pub_pdfs = request.POST.getlist('pub_pdf[]')
-            pub_githubs = request.POST.getlist('pub_github[]')
-            for idx, title in enumerate(pub_titles):
-                if not title.strip():
-                    continue
-                extra_pub = Publication(
-                    profile=profile,
-                    title=title.strip(),
-                    publication_date=pub_dates[idx] if idx < len(pub_dates) else None,
-                    pdf_link=pub_pdfs[idx] if idx < len(pub_pdfs) else '',
-                    github_link=pub_githubs[idx] if idx < len(pub_githubs) else '',
-                )
-                extra_pub.save()
-
-            course_names = request.POST.getlist('course_name[]')
-            course_semesters = request.POST.getlist('semester[]')
-            course_descs = request.POST.getlist('course_desc[]')
-            course_links = request.POST.getlist('syllabus_link[]')
-            for idx, name in enumerate(course_names):
-                if not name.strip():
-                    continue
-                extra_teaching = Teaching(
-                    profile=profile,
-                    course_name=name.strip(),
-                    semester=course_semesters[idx] if idx < len(course_semesters) else '',
-                    description=course_descs[idx] if idx < len(course_descs) else '',
-                    syllabus_link=course_links[idx] if idx < len(course_links) else '',
-                )
-                extra_teaching.save()
 
             return redirect('portfolios:onboarding_three')
         else:
@@ -266,13 +280,13 @@ def onboarding_two(request):
             except Exception:
                 logger.error('onboarding_two POST: could not serialize profile_form.errors')
             try:
-                logger.error('publication_form.errors=%s', publication_form.errors.as_json())
+                logger.error('publication_formset.errors=%s', publication_formset.errors)
             except Exception:
-                logger.error('onboarding_two POST: could not serialize publication_form.errors')
+                logger.error('onboarding_two POST: could not serialize publication_formset.errors')
             try:
-                logger.error('teaching_form.errors=%s', teaching_form.errors.as_json())
+                logger.error('teaching_formset.errors=%s', teaching_formset.errors)
             except Exception:
-                logger.error('onboarding_two POST: could not serialize teaching_form.errors')
+                logger.error('onboarding_two POST: could not serialize teaching_formset.errors')
             try:
                 logger.error('education_formset.errors=%s', json.dumps(education_formset.errors))
                 logger.error('education_formset.non_form_errors=%s', education_formset.non_form_errors())
@@ -280,14 +294,14 @@ def onboarding_two(request):
                 logger.error('onboarding_two POST: could not serialize education_formset.errors')
     else:
         profile_form = ProfileForm(instance=profile)
-        publication_form = PublicationForm()
-        teaching_form = TeachingForm()
+        publication_formset = PublicationFormSet(instance=profile)
+        teaching_formset = TeachingFormSet(instance=profile)
         education_formset = EducationFormSet(instance=profile)
 
     context = {
         'profile_form': profile_form,
-        'publication_form': publication_form,
-        'teaching_form': teaching_form,
+        'publication_formset': publication_formset,
+        'teaching_formset': teaching_formset,
         'education_formset': education_formset,
         'sections': SECTIONS,
         'education_error_message': education_error_message,

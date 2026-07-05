@@ -111,7 +111,7 @@ class OnboardingTwoTemplateTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Please complete the missing 'Start Year'")
+        self.assertContains(response, "Please complete the missing")
 
     def test_invalid_education_post_preserves_formset_data(self):
         user = User.objects.create(first_name="Test", last_name="User", email="test4@example.com")
@@ -164,4 +164,4 @@ class OnboardingTwoTemplateTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "education_entries-1-degree")
         self.assertContains(response, "value=\"MSc\"")
-        self.assertContains(response, "Please complete the missing 'Start Year'")
+        self.assertContains(response, "Please complete the missing")

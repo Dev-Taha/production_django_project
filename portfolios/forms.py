@@ -131,6 +131,19 @@ class PublicationForm(forms.ModelForm):
         if 'title' in self.fields:
             self.fields['title'].required = False
 
+    def clean(self):
+        cleaned_data = super().clean()
+        title = cleaned_data.get('title')
+        other_fields = [
+            cleaned_data.get('description'),
+            cleaned_data.get('pdf_link'),
+            cleaned_data.get('github_link'),
+            cleaned_data.get('publication_date'),
+        ]
+        if not title and any(value not in (None, '', []) for value in other_fields):
+            self.add_error('title', 'Please enter a publication title if you provide any publication details.')
+        return cleaned_data
+
 
 # ── 3. Teaching ──────────────────────────────────────────────────────────
 class TeachingForm(forms.ModelForm):
