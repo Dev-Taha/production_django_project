@@ -130,9 +130,8 @@ class TeachingForm(forms.ModelForm):
         fields = ['course_name', 'description', 'syllabus_link', 'semester']
         widgets = {
             'course_name': forms.TextInput(attrs={
-                'class': 'form-control teach-required',
+                'class': 'form-control',
                 'placeholder': 'e.g. Machine Learning 101',
-                'required': True,
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -148,6 +147,12 @@ class TeachingForm(forms.ModelForm):
                 'placeholder': 'e.g. Fall 2024'
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make teaching fields optional so onboarding does not block when none provided
+        for fname in self.fields:
+            self.fields[fname].required = False
 
 
 # ── 4. Media ─────────────────────────────────────────────────────────────
@@ -206,6 +211,12 @@ class EducationForm(forms.ModelForm):
         if end and start and end < start:
             self.add_error("end_year", "End year cannot be before start year.")
         return cleaned_data
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make education fields optional in the form so users can skip this step in the wizard
+        for fname in self.fields:
+            self.fields[fname].required = False
 
 
 

@@ -9,9 +9,9 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 
 TOGETHER_ENDPOINT = "https://api.together.xyz/v1/chat/completions"
-MAX_RETRIES = 2
-MAX_UPLOAD_SIZE = 10 * 1024 * 1024
+MAX_RETRIES = 3
 SUPPORTED_EXTENSIONS = {".pdf", ".docx"}
+MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10 MB
 
 CV_JSON_TEMPLATE = {
     "profile": {
@@ -30,96 +30,72 @@ CV_JSON_TEMPLATE = {
         "research_interests": "",
     },
     "education": [
-        {
-            "degree": "",
-            "field_of_study": "",
-            "institution": "",
-            "start_year": None,
-            "end_year": None,
-            "description": "",
-            "honor": "",
-        }
+        {"degree": "", "field_of_study": "", "institution": "", "start_year": None, "end_year": None, "description": "", "honor": ""}
     ],
     "publications": [
-        {
-            "title": "",
-            "description": "",
-            "pdf_link": "",
-            "github_link": "",
-            "publication_date": None,
-        }
+        {"title": "", "description": "", "pdf_link": "", "github_link": "", "publication_date": None}
     ],
     "teaching": [
-        {
-            "course_name": "",
-            "description": "",
-            "syllabus_link": "",
-            "semester": "",
-        }
+        {"course_name": "", "description": "", "syllabus_link": "", "semester": ""}
     ],
     "research_interests_entries": [
-        {
-            "title": "",
-            "description": "",
-            "tags": "",
-        }
+        {"title": "", "description": "", "tags": ""}
     ],
     "contact_links": [
-        {
-            "label": "",
-            "value": "",
-            "url": "",
-            "link_type": "",
-        }
+        {"label": "", "value": "", "url": "", "link_type": ""}
     ],
 }
 
 PROMPT_TEMPLATE = """
-You are an expert academic portfolio extractor. Given the plain text of an academic CV, return a single JSON object with the exact structure and field names shown below. Do not wrap the response in markdown fences, do not include any text outside the JSON object, and do not add comments.
+You are an expert academic portfolio extractor and copywriter. Given the plain text of an academic CV, return a single JSON object with the exact structure and field names shown below. Do not wrap the response in markdown fences, do not include any text outside the JSON object, and do not add comments.
 
-Return JSON exactly as this structure, with all keys present. If a field is unavailable in the CV, return an empty string "" or null, but do not omit the key.
+Important requirements:
+- Generate a professional academic `bio` for the `profile` section: 2–4 concise sentences written in a polished academic/professional tone. Do NOT copy sentences verbatim from the CV; rephrase and synthesize content from the CV (experience, education, skills, publications). If the CV has no explicit summary, construct the bio from other sections.
+- For optional fields (e.g., `research_interests_entries`, `teaching`, `contact_links`), if the CV does not contain an explicit section, attempt to infer reasonable values from other parts of the CV (e.g., infer 3–5 research interest topics from publication titles, work experience, and keywords). If inference is not possible, return empty lists or empty strings as appropriate.
+- Preserve the exact JSON structure below. Include all keys. Use empty string "" or null for unavailable scalar fields, and empty arrays for unavailable lists.
 
 Structure:
 {{
-  "profile": {{
-    "full_name": "",
-    "academic_title": "",
-    "institution": "",
-    "field_of_study": "",
-    "tagline": "",
-    "bio": "",
-    "current_status": "",
-    "google_scholar": "",
-    "research_gate": "",
-    "years_teaching": null,
-    "citation_count": null,
-    "students_supervised": null,
-    "research_interests": ""
-  }},
-  "education": [
-    {{"degree": "", "field_of_study": "", "institution": "", "start_year": null, "end_year": null, "description": "", "honor": ""}}
-  ],
-  "publications": [
-    {{"title": "", "description": "", "pdf_link": "", "github_link": "", "publication_date": null}}
-  ],
-  "teaching": [
-    {{"course_name": "", "description": "", "syllabus_link": "", "semester": ""}}
-  ],
-  "research_interests_entries": [
-    {{"title": "", "description": "", "tags": ""}}
-  ],
-  "contact_links": [
-    {{"label": "", "value": "", "url": "", "link_type": ""}}
-  ]
+    "profile": {{
+        "full_name": "",
+        "academic_title": "",
+        "institution": "",
+        "field_of_study": "",
+        "tagline": "",
+        "bio": "",
+        "current_status": "",
+        "google_scholar": "",
+        "research_gate": "",
+        "years_teaching": null,
+        "citation_count": null,
+        "students_supervised": null,
+        "research_interests": ""
+    }},
+    "education": [
+        {{"degree": "", "field_of_study": "", "institution": "", "start_year": null, "end_year": null, "description": "", "honor": ""}}
+    ],
+    "publications": [
+        {{"title": "", "description": "", "pdf_link": "", "github_link": "", "publication_date": null}}
+    ],
+    "teaching": [
+        {{"course_name": "", "description": "", "syllabus_link": "", "semester": ""}}
+    ],
+    "research_interests_entries": [
+        {{"title": "", "description": "", "tags": ""}}
+    ],
+    "contact_links": [
+        {{"label": "", "value": "", "url": "", "link_type": ""}}
+    ]
 }}
 
 CV Text:
-\"\"\"
+"""
 {cv_text}
-\"\"\"
+"""
 
 Return only the JSON object.
 """
+
 
 
 def _call_together(cv_text: str) -> str:

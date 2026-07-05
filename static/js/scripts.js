@@ -181,8 +181,8 @@ function addTeachingRow(item = {}) {
         <button type="button" class="remove-row-btn" onclick="this.closest('.teach-row').remove(); updateStepButtons();"><i class="bi bi-trash"></i></button>
         <div class="row g-3">
             <div class="col-md-6">
-                <label class="form-label fw-semibold small">Course Name <span class="text-danger">*</span></label>
-                <input type="text" name="course_name[]" class="form-control teach-required" placeholder="e.g. Machine Learning 101" value="${item.course_name || ''}">
+                <label class="form-label fw-semibold small">Course Name</label>
+                <input type="text" name="course_name[]" class="form-control" placeholder="e.g. Machine Learning 101" value="${item.course_name || ''}">
             </div>
             <div class="col-md-6">
                 <label class="form-label fw-semibold small">Semester</label>
@@ -500,7 +500,7 @@ function sectionValid(idx) {
     const sec = document.getElementById('section-' + idx);
     if (!sec) return true;
     let ok = true;
-    sec.querySelectorAll('input[required], textarea[required], input.pub-required, textarea.pub-required, input.teach-required, textarea.teach-required').forEach(el => {
+    sec.querySelectorAll('input[required], textarea[required], input.pub-required, textarea.pub-required').forEach(el => {
         const value = el.type === 'checkbox' || el.type === 'radio' ? el.checked : el.value.trim();
         if (!value) {
             el.classList.add('is-invalid');
@@ -552,7 +552,7 @@ function checkAllDone() {
 }
 
 function getSectionRequiredFields(section) {
-    return section.querySelectorAll('input[required], textarea[required], select[required], input.pub-required, textarea.pub-required, input.teach-required, textarea.teach-required');
+    return section.querySelectorAll('input[required], textarea[required], select[required], input.pub-required, textarea.pub-required');
 }
 
 function updateStepButtons() {
@@ -612,7 +612,7 @@ function updateFinalContactState() {
 }
 
 function syncValidation() {
-    document.querySelectorAll('input[required], textarea[required], input.pub-required, textarea.pub-required, input.teach-required, textarea.teach-required').forEach(el => {
+    document.querySelectorAll('input[required], textarea[required], input.pub-required, textarea.pub-required').forEach(el => {
         el.removeEventListener('input', updateStepButtons);
         el.removeEventListener('change', updateStepButtons);
         el.addEventListener('input', () => {
@@ -801,8 +801,8 @@ function addCourse() {
         <button type="button" class="remove-row-btn" onclick="this.closest('.teach-row').remove(); updateStepButtons();"><i class="bi bi-trash"></i></button>
         <div class="row g-3">
             <div class="col-md-6">
-                <label class="form-label fw-semibold small">Course Name <span class="text-danger">*</span></label>
-                <input type="text" name="course_name[]" class="form-control teach-required" placeholder="e.g. Machine Learning 101">
+                <label class="form-label fw-semibold small">Course Name</label>
+                <input type="text" name="course_name[]" class="form-control" placeholder="e.g. Machine Learning 101">
             </div>
             <div class="col-md-6">
                 <label class="form-label fw-semibold small">Semester</label>
