@@ -28,7 +28,7 @@ from services.ai_extraction import (
     save_extracted_data,
 )
 from .models import Profile, Publication, Teaching, Theme
-from .forms import ProfileForm, PublicationForm, TeachingForm
+from .forms import ProfileForm, PublicationForm, TeachingForm, EducationFormSet
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ CV_TASKS: dict[str, dict] = {}
 CV_TASKS_LOCK = threading.Lock()
 
 SECTIONS = [
-    'Personal Info', 'Professional Bio', 'Research Interests',
+    'Personal Info', 'Professional Bio', 'Education', 'Research Interests',
     'Publications', 'Teaching Load', 'Contact Details',
 ]
 
@@ -159,8 +159,12 @@ def onboarding_two(request):
         profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
         publication_form = PublicationForm(request.POST)
         teaching_form = TeachingForm(request.POST)
+        education_formset = EducationFormSet(request.POST, instance=profile)
 
-        if profile_form.is_valid() and publication_form.is_valid() and teaching_form.is_valid():
+        # validate everything; publications/teaching handling stays as-is
+        forms_valid = profile_form.is_valid() and publication_form.is_valid() and teaching_form.is_valid() and education_formset.is_valid()
+
+        if forms_valid:
             profile_form.save()
 
             publication = publication_form.save(commit=False)
@@ -170,6 +174,9 @@ def onboarding_two(request):
             teaching = teaching_form.save(commit=False)
             teaching.profile = profile
             teaching.save()
+
+            # Save education formset (create/update/delete automatically)
+            education_formset.save()
 
             pub_titles = request.POST.getlist('pub_title[]')
             pub_dates = request.POST.getlist('pub_date[]')
@@ -208,11 +215,13 @@ def onboarding_two(request):
         profile_form = ProfileForm(instance=profile)
         publication_form = PublicationForm()
         teaching_form = TeachingForm()
+        education_formset = EducationFormSet(instance=profile)
 
     context = {
         'profile_form': profile_form,
         'publication_form': publication_form,
         'teaching_form': teaching_form,
+        'education_formset': education_formset,
         'sections': SECTIONS,
     }
     return render(request, 'onboarding/onboarding2.html', context)

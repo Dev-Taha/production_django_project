@@ -114,6 +114,70 @@
                     </div>
                 </section>
 
+                <section class="wizard-section card shadow-sm rounded-3 mb-4" id="section-3" data-step="3">
+                    <div class="card-header bg-white border-bottom py-3 px-4">
+                        <h5 class="mb-1 fw-bold">Education</h5>
+                        <p class="text-secondary small mb-0">Add your degrees and academic qualifications.</p>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if education_formset %}
+                        {{ education_formset.management_form }}
+                        <div id="edu-container">
+                            {% for form in education_formset.forms %}
+                            <div class="edu-row">
+                                <button type="button" class="remove-row-btn"
+                                    onclick="this.closest('.edu-row').remove(); updateStepButtons();"><i
+                                        class="bi bi-trash"></i></button>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold small">Degree</label>
+                                        {{ form.degree }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold small">Field of Study</label>
+                                        {{ form.field_of_study }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold small">Institution</label>
+                                        {{ form.institution }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-semibold small">Start Year</label>
+                                        {{ form.start_year }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-semibold small">End Year</label>
+                                        {{ form.end_year }}
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label fw-semibold small">Description</label>
+                                        {{ form.description }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold small">Honor</label>
+                                        {{ form.honor }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div id="edu-empty" class="d-none">
+                            {{ education_formset.empty_form.as_p|safe }}
+                        </div>
+                        <button type="button"
+                            class="btn btn-outline-secondary d-inline-flex align-items-center justify-content-center rounded-3 w-100 mt-4 py-3"
+                            data-add-edu>
+                            <i class="bi bi-plus-lg me-2"></i> Add Another Degree
+                        </button>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-white border-top d-flex justify-content-between py-3 px-4">
+                        <button type="button" class="btn btn-outline-secondary px-4" data-wizard-prev="2">Back</button>
+                        <button type="button" class="btn btn-primary px-4" data-wizard-next="2" disabled>Next
+                            Step</button>
+                    </div>
+                </section>
+
                 <section class="wizard-section card shadow-sm rounded-3 mb-4" id="section-2" data-step="2">
                     <div class="card-header bg-white border-bottom py-3 px-4">
                         <h5 class="mb-1 fw-bold">Research Interests</h5>
@@ -131,13 +195,13 @@
                         <p class="text-secondary small mt-2">Press Enter or comma to save each keyword.</p>
                     </div>
                     <div class="card-footer bg-white border-top d-flex justify-content-between py-3 px-4">
-                        <button type="button" class="btn btn-outline-secondary px-4" data-wizard-prev="2">Back</button>
-                        <button type="button" class="btn btn-primary px-4" data-wizard-next="2" disabled>Next
+                        <button type="button" class="btn btn-outline-secondary px-4" data-wizard-prev="3">Back</button>
+                        <button type="button" class="btn btn-primary px-4" data-wizard-next="3" disabled>Next
                             Step</button>
                     </div>
                 </section>
 
-                <section class="wizard-section card shadow-sm rounded-3 mb-4" id="section-3" data-step="3">
+                <section class="wizard-section card shadow-sm rounded-3 mb-4" id="section-4" data-step="4">
                     <div
                         class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
                         <div>
@@ -179,13 +243,13 @@
                         </button>
                     </div>
                     <div class="card-footer bg-white border-top d-flex justify-content-between py-3 px-4">
-                        <button type="button" class="btn btn-outline-secondary px-4" data-wizard-prev="3">Back</button>
-                        <button type="button" class="btn btn-primary px-4" data-wizard-next="3" disabled>Next
+                        <button type="button" class="btn btn-outline-secondary px-4" data-wizard-prev="4">Back</button>
+                        <button type="button" class="btn btn-primary px-4" data-wizard-next="4" disabled>Next
                             Step</button>
                     </div>
                 </section>
 
-                <section class="wizard-section card shadow-sm rounded-3 mb-4" id="section-4" data-step="4">
+                <section class="wizard-section card shadow-sm rounded-3 mb-4" id="section-5" data-step="5">
                     <div class="card-header bg-white border-bottom py-3 px-4">
                         <h5 class="mb-1 fw-bold">Teaching Load</h5>
                         <p class="text-secondary small mb-0">Document courses and supporting materials.</p>
@@ -222,13 +286,13 @@
                         </button>
                     </div>
                     <div class="card-footer bg-white border-top d-flex justify-content-between py-3 px-4">
-                        <button type="button" class="btn btn-outline-secondary px-4" data-wizard-prev="4">Back</button>
-                        <button type="button" class="btn btn-primary px-4" data-wizard-next="4" disabled>Next
+                        <button type="button" class="btn btn-outline-secondary px-4" data-wizard-prev="5">Back</button>
+                        <button type="button" class="btn btn-primary px-4" data-wizard-next="5" disabled>Next
                             Step</button>
                     </div>
                 </section>
 
-                <section class="wizard-section card shadow-sm rounded-3 mb-4" id="section-5" data-step="5">
+                <section class="wizard-section card shadow-sm rounded-3 mb-4" id="section-6" data-step="6">
                     <div
                         class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
                         <div>
@@ -252,7 +316,7 @@
                         </div>
                     </div>
                     <div class="card-footer bg-white border-top d-flex justify-content-between py-3 px-4">
-                        <button type="button" class="btn btn-outline-secondary px-4" data-wizard-prev="5">Back</button>
+                        <button type="button" class="btn btn-outline-secondary px-4" data-wizard-prev="6">Back</button>
                         <button type="submit" class="btn btn-primary px-4" id="go-step3-btn" disabled>Submit &
                             Continue</button>
                     </div>

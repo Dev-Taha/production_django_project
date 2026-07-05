@@ -201,6 +201,65 @@ function addTeachingRow(item = {}) {
     syncValidation();
 }
 
+function addEducationRow(item = {}) {
+    const c = document.getElementById('edu-container');
+    if (!c) return;
+    // try to use the empty form template if present
+    const empty = document.getElementById('edu-empty')?.innerHTML;
+    const totalInput = document.querySelector('input[name*="education"][name$="-TOTAL_FORMS"]');
+    let index = 0;
+    if (totalInput) {
+        index = parseInt(totalInput.value, 10);
+    }
+    if (empty) {
+        const html = empty.replace(/__prefix__/g, index);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'edu-row';
+        wrapper.innerHTML = `<button type="button" class="remove-row-btn" onclick="this.closest('.edu-row').remove(); updateStepButtons();"><i class="bi bi-trash"></i></button>${html}`;
+        c.appendChild(wrapper);
+        if (totalInput) totalInput.value = index + 1;
+        syncValidation();
+        return;
+    }
+
+    const div = document.createElement('div');
+    div.className = 'edu-row';
+    div.innerHTML = `
+        <button type="button" class="remove-row-btn" onclick="this.closest('.edu-row').remove(); updateStepButtons();"><i class="bi bi-trash"></i></button>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">Degree</label>
+                <input type="text" name="edu_degree[]" class="form-control" value="${item.degree || ''}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">Field of Study</label>
+                <input type="text" name="edu_field[]" class="form-control" value="${item.field_of_study || ''}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">Institution</label>
+                <input type="text" name="edu_institution[]" class="form-control" value="${item.institution || ''}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold small">Start Year</label>
+                <input type="number" name="edu_start[]" class="form-control" value="${item.start_year || ''}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold small">End Year</label>
+                <input type="number" name="edu_end[]" class="form-control" value="${item.end_year || ''}">
+            </div>
+            <div class="col-md-12">
+                <label class="form-label fw-semibold small">Description</label>
+                <textarea name="edu_description[]" class="form-control" rows="2">${item.description || ''}</textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">Honor</label>
+                <input type="text" name="edu_honor[]" class="form-control" value="${item.honor || ''}">
+            </div>
+        </div>`;
+    c.appendChild(div);
+    syncValidation();
+}
+
 function initializeOnboarding2FromSession() {
     const rawData = sessionStorage.getItem('cv_extracted_data');
     if (!rawData) return;
@@ -242,6 +301,36 @@ function initializeOnboarding2FromSession() {
         setFormValue('textarea[name="description"]', first.description || '');
         setFormValue('input[name="syllabus_link"]', first.syllabus_link || '');
         extracted.teaching.slice(1).forEach(addTeachingRow);
+    }
+
+    if (Array.isArray(extracted.education) && extracted.education.length) {
+        // try to populate existing formset fields (Django formset names) or fall back to addEducationRow
+        const degreeInputs = document.querySelectorAll('input[name$="-degree"]');
+        if (degreeInputs && degreeInputs.length) {
+            extracted.education.forEach((item, idx) => {
+                const suffix = `-${idx}-degree`;
+                const deg = document.querySelector(`input[name$="${suffix}"]`);
+                if (deg) {
+                    deg.value = item.degree || '';
+                    const field = document.querySelector(`input[name$="-${idx}-field_of_study"]`);
+                    if (field) field.value = item.field_of_study || '';
+                    const inst = document.querySelector(`input[name$="-${idx}-institution"]`);
+                    if (inst) inst.value = item.institution || '';
+                    const st = document.querySelector(`input[name$="-${idx}-start_year"]`);
+                    if (st) st.value = item.start_year || '';
+                    const en = document.querySelector(`input[name$="-${idx}-end_year"]`);
+                    if (en) en.value = item.end_year || '';
+                    const desc = document.querySelector(`textarea[name$="-${idx}-description"]`);
+                    if (desc) desc.value = item.description || '';
+                    const honor = document.querySelector(`input[name$="-${idx}-honor"]`);
+                    if (honor) honor.value = item.honor || '';
+                } else {
+                    addEducationRow(item);
+                }
+            });
+        } else {
+            extracted.education.forEach(addEducationRow);
+        }
     }
 
     const filledCount = [
@@ -379,8 +468,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // ── ONBOARDING 2: MULTI-STEP WIZARD ─────────────────────────────────────────
-const TOTAL = 6;
-const sectionDone = new Array(TOTAL).fill(false);
+let TOTAL = 0;
+let sectionDone = [];
 let current = 0;
 
 function showSection(idx) {
@@ -490,22 +579,25 @@ function updateFinalContactState() {
     const research = document.querySelector('input[name="research_gate"]');
     const submitBtn = document.getElementById('go-step3-btn');
     const continueBtn = document.getElementById('continue-btn');
-    const dot = document.getElementById('dot-5');
     const isValid = Boolean(scholar?.value.trim() || research?.value.trim());
 
     if (submitBtn) {
         submitBtn.disabled = !isValid;
     }
 
+    const finalIndex = TOTAL > 0 ? TOTAL - 1 : null;
+    const dots = document.querySelectorAll('.tracker-dot');
+    const dot = (finalIndex !== null && dots[finalIndex]) ? dots[finalIndex] : null;
+
     if (dot) {
         if (isValid) {
             dot.classList.add('done');
             dot.innerHTML = '<i class="bi bi-check-lg" style="font-size:.65rem;"></i>';
-            sectionDone[5] = true;
+            if (finalIndex !== null) sectionDone[finalIndex] = true;
         } else {
             dot.classList.remove('done');
             dot.innerHTML = '';
-            sectionDone[5] = false;
+            if (finalIndex !== null) sectionDone[finalIndex] = false;
         }
     }
 
@@ -647,9 +739,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const addCourseButton = document.querySelector('[data-add-course]');
     if (addCourseButton) addCourseButton.addEventListener('click', addCourse);
+    const addEduButton = document.querySelector('[data-add-edu]');
+    if (addEduButton) addEduButton.addEventListener('click', () => addEducationRow());
 
     // Init wizard on onboarding2 page and autofill if the CV extractor returned data.
     if (document.getElementById('step2-form')) {
+        // compute TOTAL based on sidebar items
+        TOTAL = document.querySelectorAll('.sidebar-step').length || 0;
+        sectionDone = new Array(TOTAL).fill(false);
+
         initializeOnboarding2FromSession();
         showSection(0);
         updateStepButtons();
