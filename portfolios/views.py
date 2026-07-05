@@ -177,6 +177,9 @@ def onboarding_two(request):
     user = get_current_user(request)
     profile = get_profile(user)
 
+    education_error_message = None
+    focus_education = False
+
     if request.method == 'POST':
         profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
         publication_form = PublicationForm(request.POST)
@@ -185,6 +188,7 @@ def onboarding_two(request):
 
         # validate everything; publications/teaching handling stays as-is
         forms_valid = profile_form.is_valid() and publication_form.is_valid() and teaching_form.is_valid() and education_formset.is_valid()
+        education_error_message = None
 
         if forms_valid:
             profile_form.save()
@@ -242,8 +246,21 @@ def onboarding_two(request):
 
             return redirect('portfolios:onboarding_three')
         else:
-            # Provide a clear message when validation fails so the user isn't silently returned
-            messages.error(request, 'There was an error saving your information. Please review the highlighted fields and try again.')
+            education_error_message = None
+            if not education_formset.is_valid():
+                for form in education_formset.forms:
+                    for field, field_errors in form.errors.items():
+                        if field == 'start_year' or any('start year' in str(error).lower() for error in field_errors):
+                            education_error_message = "Please complete the missing 'Start Year' field for the education entry you started filling in, or delete that row entirely if you do not want to add it."
+                            break
+                    if education_error_message:
+                        break
+
+            if education_error_message:
+                messages.error(request, education_error_message)
+                focus_education = True
+            else:
+                messages.error(request, 'There was an error saving your information. Please review the highlighted fields and try again.')
             try:
                 logger.error('onboarding_two POST validation failed; profile_form.errors=%s', profile_form.errors.as_json())
             except Exception:
@@ -258,6 +275,7 @@ def onboarding_two(request):
                 logger.error('onboarding_two POST: could not serialize teaching_form.errors')
             try:
                 logger.error('education_formset.errors=%s', json.dumps(education_formset.errors))
+                logger.error('education_formset.non_form_errors=%s', education_formset.non_form_errors())
             except Exception:
                 logger.error('onboarding_two POST: could not serialize education_formset.errors')
     else:
@@ -272,6 +290,8 @@ def onboarding_two(request):
         'teaching_form': teaching_form,
         'education_formset': education_formset,
         'sections': SECTIONS,
+        'education_error_message': education_error_message,
+        'focus_education': bool(education_error_message),
     }
     return render(request, 'onboarding/onboarding2.html', context)
 

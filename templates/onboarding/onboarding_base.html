@@ -46,9 +46,12 @@ Onboarding
     <!-- Main Content -->
     {% block step_content %}
     {% if messages %}
-    <div class="container mt-3 px-4">
+    <div class="container mt-4 px-4">
         {% for msg in messages %}
-        <div class="alert alert-danger small py-2">{{ msg }}</div>
+        <div class="alert alert-danger py-3 mb-3 rounded-3 border-0 shadow-sm" role="alert">
+            <div class="fw-semibold">Please review the form</div>
+            <div class="small mt-1">{{ msg }}</div>
+        </div>
         {% endfor %}
     </div>
     {% endif %}

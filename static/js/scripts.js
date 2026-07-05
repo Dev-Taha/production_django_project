@@ -746,7 +746,12 @@ document.addEventListener("DOMContentLoaded", () => {
         sectionDone = new Array(TOTAL).fill(false);
 
         initializeOnboarding2FromSession();
-        showSection(0);
+        const shouldFocusEducation = document.querySelector('[data-focus-education]')?.dataset.focusEducation === 'true';
+        if (shouldFocusEducation) {
+            showSection(2);
+        } else {
+            showSection(0);
+        }
         updateStepButtons();
     }
 });

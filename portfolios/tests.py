@@ -69,3 +69,46 @@ class OnboardingTwoTemplateTests(TestCase):
 
         self.assertRedirects(response, reverse("portfolios:onboarding_three"))
         self.assertFalse(Education.objects.exists())
+
+    def test_partial_education_entry_shows_user_facing_error(self):
+        user = User.objects.create(first_name="Test", last_name="User", email="test3@example.com")
+        session = self.client.session
+        session["user_id"] = user.id
+        session.save()
+
+        response = self.client.post(
+            reverse("portfolios:onboarding_two"),
+            {
+                "full_name": "Test User",
+                "academic_title": "Dr.",
+                "institution": "Test University",
+                "field_of_study": "Computer Science",
+                "bio": "A short bio",
+                "tagline": "",
+                "google_scholar": "",
+                "research_gate": "",
+                "research_interests": "",
+                "title": "",
+                "description": "",
+                "pdf_link": "",
+                "github_link": "",
+                "publication_date": "",
+                "course_name": "",
+                "semester": "",
+                "syllabus_link": "",
+                "education_entries-TOTAL_FORMS": "1",
+                "education_entries-INITIAL_FORMS": "0",
+                "education_entries-MAX_NUM_FORMS": "1000",
+                "education_entries-0-degree": "PhD",
+                "education_entries-0-field_of_study": "",
+                "education_entries-0-institution": "MIT",
+                "education_entries-0-start_year": "",
+                "education_entries-0-end_year": "",
+                "education_entries-0-description": "",
+                "education_entries-0-honor": "",
+                "education_entries-0-DELETE": "",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Please complete the missing 'Start Year'")
