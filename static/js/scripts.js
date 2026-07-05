@@ -143,13 +143,31 @@ function setFormValue(selector, value) {
     el.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
+function updateRepeatableSectionTitles() {
+    document.querySelectorAll('.edu-row').forEach((row, index) => {
+        const label = row.querySelector('.repeatable-card-title');
+        if (label) label.textContent = `Education #${index + 1}`;
+    });
+    document.querySelectorAll('.pub-row').forEach((row, index) => {
+        const label = row.querySelector('.repeatable-card-title');
+        if (label) label.textContent = `Publication #${index + 1}`;
+    });
+    document.querySelectorAll('.teach-row').forEach((row, index) => {
+        const label = row.querySelector('.repeatable-card-title');
+        if (label) label.textContent = `Teaching #${index + 1}`;
+    });
+}
+
 function addPublicationRow(item = {}) {
     const c = document.getElementById('pub-container');
     if (!c) return;
     const div = document.createElement('div');
-    div.className = 'pub-row';
+    div.className = 'pub-row repeatable-card';
     div.innerHTML = `
-        <button type="button" class="remove-row-btn" onclick="this.closest('.pub-row').remove(); updateStepButtons();"><i class="bi bi-trash"></i></button>
+        <div class="repeatable-card-header">
+            <div class="repeatable-card-title">Publication #${c.querySelectorAll('.pub-row').length + 1}</div>
+            <button type="button" class="remove-row-btn" onclick="this.closest('.pub-row').remove(); updateStepButtons(); updateRepeatableSectionTitles();"><i class="bi bi-trash"></i></button>
+        </div>
         <div class="row g-3">
             <div class="col-md-8">
                 <label class="form-label fw-semibold small">Title <span class="text-danger">*</span></label>
@@ -176,9 +194,12 @@ function addTeachingRow(item = {}) {
     const c = document.getElementById('teach-container');
     if (!c) return;
     const div = document.createElement('div');
-    div.className = 'teach-row';
+    div.className = 'teach-row repeatable-card';
     div.innerHTML = `
-        <button type="button" class="remove-row-btn" onclick="this.closest('.teach-row').remove(); updateStepButtons();"><i class="bi bi-trash"></i></button>
+        <div class="repeatable-card-header">
+            <div class="repeatable-card-title">Teaching #${c.querySelectorAll('.teach-row').length + 1}</div>
+            <button type="button" class="remove-row-btn" onclick="this.closest('.teach-row').remove(); updateStepButtons(); updateRepeatableSectionTitles();"><i class="bi bi-trash"></i></button>
+        </div>
         <div class="row g-3">
             <div class="col-md-6">
                 <label class="form-label fw-semibold small">Course Name</label>
@@ -214,18 +235,22 @@ function addEducationRow(item = {}) {
     if (empty) {
         const html = empty.replace(/__prefix__/g, index);
         const wrapper = document.createElement('div');
-        wrapper.className = 'edu-row';
-        wrapper.innerHTML = `<button type="button" class="remove-row-btn" onclick="this.closest('.edu-row').remove(); updateStepButtons();"><i class="bi bi-trash"></i></button>${html}`;
+        wrapper.className = 'edu-row repeatable-card';
+        wrapper.innerHTML = `<div class="repeatable-card-header"><div class="repeatable-card-title">Education #${c.querySelectorAll('.edu-row').length + 1}</div><button type="button" class="remove-row-btn" onclick="this.closest('.edu-row').remove(); updateStepButtons(); updateRepeatableSectionTitles();"><i class="bi bi-trash"></i></button></div>${html}`;
         c.appendChild(wrapper);
         if (totalInput) totalInput.value = index + 1;
         syncValidation();
+        updateRepeatableSectionTitles();
         return;
     }
 
     const div = document.createElement('div');
-    div.className = 'edu-row';
+    div.className = 'edu-row repeatable-card';
     div.innerHTML = `
-        <button type="button" class="remove-row-btn" onclick="this.closest('.edu-row').remove(); updateStepButtons();"><i class="bi bi-trash"></i></button>
+        <div class="repeatable-card-header">
+            <div class="repeatable-card-title">Education #${c.querySelectorAll('.edu-row').length + 1}</div>
+            <button type="button" class="remove-row-btn" onclick="this.closest('.edu-row').remove(); updateStepButtons(); updateRepeatableSectionTitles();"><i class="bi bi-trash"></i></button>
+        </div>
         <div class="row g-3">
             <div class="col-md-6">
                 <label class="form-label fw-semibold small">Degree</label>
@@ -512,7 +537,49 @@ function sectionValid(idx) {
     return ok;
 }
 
+function validateEducationSection() {
+    const educationRows = document.querySelectorAll('#edu-container .edu-row');
+    let hasInvalidRow = false;
+
+    educationRows.forEach(row => {
+        const startYearInput = row.querySelector('input[name$="-start_year"], input[name$="start_year"]');
+        const inlineError = row.querySelector('.education-inline-error');
+        const otherFields = Array.from(row.querySelectorAll('input, textarea')).filter(el => {
+            if (!el.name) return false;
+            if (el.name.includes('start_year') || el.name.includes('end_year')) return false;
+            if (el.type === 'hidden') return false;
+            return el.value.trim() !== '';
+        });
+
+        const hasAnyContent = otherFields.length > 0;
+        const hasStartYear = !!(startYearInput && startYearInput.value && String(startYearInput.value).trim() !== '');
+
+        if (hasAnyContent && !hasStartYear) {
+            hasInvalidRow = true;
+            startYearInput?.classList.add('is-invalid');
+            if (inlineError) {
+                inlineError.textContent = 'Start year is required for this entry.';
+                inlineError.classList.remove('d-none');
+            }
+        } else {
+            startYearInput?.classList.remove('is-invalid');
+            if (inlineError) {
+                inlineError.textContent = '';
+                inlineError.classList.add('d-none');
+            }
+        }
+    });
+
+    return !hasInvalidRow;
+}
+
 function nextSection(idx) {
+    if (idx === 2) {
+        if (!validateEducationSection()) {
+            showSection(2);
+            return;
+        }
+    }
     if (!sectionValid(idx)) return;
     markDone(idx);
     if (idx + 1 < TOTAL) showSection(idx + 1);

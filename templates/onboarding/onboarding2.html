@@ -2,6 +2,49 @@
 
 {% load static %}
 
+<style>
+    .repeatable-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        padding: 1rem 1rem 1.1rem;
+        background: #fff;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+        margin-bottom: 1rem;
+    }
+
+    .repeatable-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.9rem;
+    }
+
+    .repeatable-card-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #2563eb;
+    }
+
+    .repeatable-card .remove-row-btn {
+        border: 1px solid #fecaca;
+        color: #dc2626;
+        background: #fff1f2;
+        padding: 0.4rem 0.7rem;
+        border-radius: 999px;
+        font-size: 0.9rem;
+    }
+
+    .repeatable-card .remove-row-btn:hover {
+        background: #ffe4e6;
+    }
+
+    .education-inline-error {
+        color: #dc2626;
+        font-size: 0.8rem;
+        margin-top: 0.35rem;
+    }
+</style>
+
 {% block step2_active %}active{% endblock step2_active %}
 
 {% block button %}
@@ -136,11 +179,14 @@
                             {{ education_formset.management_form }}
                             <div id="edu-container">
                                 {% for form in education_formset.forms %}
-                                <div class="edu-row">
+                                <div class="edu-row repeatable-card">
                                     {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
-                                    <button type="button" class="remove-row-btn"
-                                        onclick="this.closest('.edu-row').remove(); updateStepButtons();"><i
-                                            class="bi bi-trash"></i></button>
+                                    <div class="repeatable-card-header">
+                                        <div class="repeatable-card-title">Education #{{ forloop.counter }}</div>
+                                        <button type="button" class="remove-row-btn"
+                                            onclick="this.closest('.edu-row').remove(); updateStepButtons(); updateRepeatableSectionTitles();"><i
+                                                class="bi bi-trash"></i></button>
+                                    </div>
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <label class="form-label fw-semibold small">Degree</label>
@@ -163,8 +209,12 @@
                                                 class="form-control is-invalid" placeholder="e.g. 2018">
                                             <div class="invalid-feedback d-block">Start year is required</div>
                                             {% else %}
-                                            {{ form.start_year }}
+                                            <input type="number" name="{{ form.start_year.html_name }}"
+                                                id="{{ form.start_year.id_for_label }}"
+                                                value="{{ form.start_year.value|default_if_none:'' }}"
+                                                class="form-control" placeholder="e.g. 2018">
                                             {% endif %}
+                                            <div class="education-inline-error d-none"></div>
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label fw-semibold small">End Year</label>
@@ -239,27 +289,36 @@
                         </div>
                         <div class="card-body p-4">
                             <div id="pub-container">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold small"
-                                            for="{{ publication_form.title.id_for_label }}">Title</label>
-                                        {{ publication_form.title }}
+                                <div class="pub-row repeatable-card">
+                                    <div class="repeatable-card-header">
+                                        <div class="repeatable-card-title">Publication #1</div>
+                                        <button type="button" class="remove-row-btn"
+                                            onclick="this.closest('.pub-row').remove(); updateStepButtons(); updateRepeatableSectionTitles();"><i
+                                                class="bi bi-trash"></i></button>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold small"
-                                            for="{{ publication_form.publication_date.id_for_label }}">Publication
-                                            Date</label>
-                                        {{ publication_form.publication_date }}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold small"
-                                            for="{{ publication_form.pdf_link.id_for_label }}">PDF Link</label>
-                                        {{ publication_form.pdf_link }}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold small"
-                                            for="{{ publication_form.github_link.id_for_label }}">GitHub Link</label>
-                                        {{ publication_form.github_link }}
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold small"
+                                                for="{{ publication_form.title.id_for_label }}">Title</label>
+                                            {{ publication_form.title }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold small"
+                                                for="{{ publication_form.publication_date.id_for_label }}">Publication
+                                                Date</label>
+                                            {{ publication_form.publication_date }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold small"
+                                                for="{{ publication_form.pdf_link.id_for_label }}">PDF Link</label>
+                                            {{ publication_form.pdf_link }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold small"
+                                                for="{{ publication_form.github_link.id_for_label }}">GitHub
+                                                Link</label>
+                                            {{ publication_form.github_link }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -284,26 +343,35 @@
                         </div>
                         <div class="card-body p-4">
                             <div id="teach-container">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold small"
-                                            for="{{ teaching_form.course_name.id_for_label }}">Course Name</label>
-                                        {{ teaching_form.course_name }}
+                                <div class="teach-row repeatable-card">
+                                    <div class="repeatable-card-header">
+                                        <div class="repeatable-card-title">Teaching #1</div>
+                                        <button type="button" class="remove-row-btn"
+                                            onclick="this.closest('.teach-row').remove(); updateStepButtons(); updateRepeatableSectionTitles();"><i
+                                                class="bi bi-trash"></i></button>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold small"
-                                            for="{{ teaching_form.semester.id_for_label }}">Semester</label>
-                                        {{ teaching_form.semester }}
-                                    </div>
-                                    <div class="col-md-8">
-                                        <label class="form-label fw-semibold small"
-                                            for="{{ teaching_form.description.id_for_label }}">Description</label>
-                                        {{ teaching_form.description }}
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-semibold small"
-                                            for="{{ teaching_form.syllabus_link.id_for_label }}">Syllabus Link</label>
-                                        {{ teaching_form.syllabus_link }}
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold small"
+                                                for="{{ teaching_form.course_name.id_for_label }}">Course Name</label>
+                                            {{ teaching_form.course_name }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold small"
+                                                for="{{ teaching_form.semester.id_for_label }}">Semester</label>
+                                            {{ teaching_form.semester }}
+                                        </div>
+                                        <div class="col-md-8">
+                                            <label class="form-label fw-semibold small"
+                                                for="{{ teaching_form.description.id_for_label }}">Description</label>
+                                            {{ teaching_form.description }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-semibold small"
+                                                for="{{ teaching_form.syllabus_link.id_for_label }}">Syllabus
+                                                Link</label>
+                                            {{ teaching_form.syllabus_link }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
