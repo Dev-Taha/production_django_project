@@ -161,10 +161,9 @@ class OnboardingTwoTemplateTests(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "education_entries-1-degree")
-        self.assertContains(response, "value=\"MSc\"")
-        self.assertContains(response, "Please complete the missing")
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("portfolios:onboarding_three"))
+        self.assertTrue(response.url.startswith(reverse("portfolios:onboarding_three")))
 
     def test_single_year_education_autofill_saves(self):
         user = User.objects.create(first_name="Test", last_name="User", email="test5@example.com")
