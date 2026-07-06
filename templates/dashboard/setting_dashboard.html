@@ -5,138 +5,183 @@
 {% block nav_settings %}active{% endblock %}
 
 {% block dashboard_content %}
-<div class="mb-4">
-    <h3 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.02em;">Account Settings</h3>
-    <p class="text-secondary mb-0">Manage your academic profile and application preferences.</p>
+<div class="settings-page-shell">
+    <div class="card publication-card border-0">
+        <div class="card-header publication-card-header py-4">
+            <div class="d-flex align-items-center gap-3">
+                <div class="publication-icon-badge">
+                    <i class="bi bi-gear-wide-connected"></i>
+                </div>
+                <div>
+                    <h4 class="mb-1">Account Settings</h4>
+                    <p class="publication-card-subtitle mb-0">Manage your academic profile and application preferences.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-4 p-lg-5">
+            <form method="post" enctype="multipart/form-data" class="publication-form">
+                {% csrf_token %}
+
+                <div class="settings-section-card">
+                    <div class="settings-section-header">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-person-badge"></i>
+                            <div>
+                                <h5 class="mb-1">Profile Information</h5>
+                                <p class="mb-0">Update your personal and academic details.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-section-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-3 col-lg-2 d-flex flex-column align-items-center mb-4 mb-md-0">
+                                <div class="account-avatar-wrap mb-3">
+                                    {% if profile.profile_picture %}
+                                    <img src="{{ profile.profile_picture.url }}" alt="Avatar"
+                                        class="w-100 h-100 object-fit-cover">
+                                    {% elif user.profile_picture %}
+                                    <img src="{{ user.profile_picture }}" alt="Avatar"
+                                        class="w-100 h-100 object-fit-cover">
+                                    {% else %}
+                                    <img src="https://i.pravatar.cc/150?img=12" alt="Avatar"
+                                        class="w-100 h-100 object-fit-cover">
+                                    {% endif %}
+                                </div>
+                                <label for="{{ form.profile_image.id_for_label }}" class="settings-photo-link mb-1">Edit
+                                    Photo</label>
+                                {{ form.profile_image }}
+                                {% if form.profile_image.errors %}
+                                <div class="text-danger small mt-1">{{ form.profile_image.errors|striptags }}</div>
+                                {% endif %}
+                                <span class="settings-help-text">JPG or PNG. Max 5MB.</span>
+                            </div>
+
+                            <div class="col-md-9 col-lg-10 ps-md-4">
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <label class="settings-label" for="{{ form.full_name.id_for_label }}">Full
+                                            Name</label>
+                                        {{ form.full_name }}
+                                        {% if form.full_name.errors %}<div class="text-danger small mt-1">{{
+                                            form.full_name.errors|striptags }}</div>{% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="settings-label"
+                                            for="{{ form.academic_title.id_for_label }}">Academic Title</label>
+                                        {{ form.academic_title }}
+                                        {% if form.academic_title.errors %}<div class="text-danger small mt-1">{{
+                                            form.academic_title.errors|striptags }}</div>{% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="settings-label"
+                                            for="{{ form.institution.id_for_label }}">Institution</label>
+                                        {{ form.institution }}
+                                        {% if form.institution.errors %}<div class="text-danger small mt-1">{{
+                                            form.institution.errors|striptags }}</div>{% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="settings-label" for="{{ form.field_of_study.id_for_label }}">Field
+                                            of Study</label>
+                                        {{ form.field_of_study }}
+                                        {% if form.field_of_study.errors %}<div class="text-danger small mt-1">{{
+                                            form.field_of_study.errors|striptags }}</div>{% endif %}
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="settings-label" for="{{ form.bio.id_for_label }}">Bio</label>
+                                        {{ form.bio }}
+                                        {% if form.bio.errors %}<div class="text-danger small mt-1">{{
+                                            form.bio.errors|striptags }}</div>{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section-card">
+                    <div class="settings-section-header">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-shield-lock"></i>
+                            <div>
+                                <h5 class="mb-1">Account & Security</h5>
+                                <p class="mb-0">Manage your login credentials.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-section-body">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="settings-label" for="{{ form.email.id_for_label }}">Email Address</label>
+                                <div class="settings-input-wrapper">
+                                    {{ form.email }}
+                                    <input type="hidden" name="email" value="{{ user.email }}">
+                                    <i class="bi bi-patch-check-fill settings-input-right-icon text-dark"
+                                        style="opacity: 0.75;"></i>
+                                </div>
+                                {% if form.email.errors %}<div class="text-danger small mt-1">{{
+                                    form.email.errors|striptags }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="settings-label"
+                                    for="{{ form.new_password.id_for_label }}">Password</label>
+                                <div class="settings-input-wrapper">
+                                    {{ form.new_password }}
+                                    <i class="bi bi-lock settings-input-right-icon text-dark"
+                                        style="opacity: 0.75;"></i>
+                                </div>
+                                {% if form.new_password.errors %}<div class="text-danger small mt-1">{{
+                                    form.new_password.errors|striptags }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="settings-label" for="{{ form.confirm_password.id_for_label }}">Confirm
+                                    Password</label>
+                                <div class="settings-input-wrapper">
+                                    {{ form.confirm_password }}
+                                    <i class="bi bi-lock settings-input-right-icon text-dark"
+                                        style="opacity: 0.75;"></i>
+                                </div>
+                                {% if form.confirm_password.errors %}<div class="text-danger small mt-1">{{
+                                    form.confirm_password.errors|striptags }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section-card">
+                    <div class="settings-section-header">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-link-45deg"></i>
+                            <div>
+                                <h5 class="mb-1">Connected Accounts</h5>
+                                <p class="mb-0">Manage your linked sign-in options.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-section-body">
+                        <div class="connected-account-box d-flex align-items-center flex-wrap gap-3">
+                            <div class="google-icon-box shadow-sm">
+                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"
+                                    style="width: 18px; height: 18px;">
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold text-dark mb-0">Google Account Connected</h6>
+                                <p class="text-secondary small mb-0 lh-sm">Used for single sign-on and data syncing</p>
+                            </div>
+                            <div>
+                                <span class="badge-connected">Connected</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="publication-actions">
+                    <a href="{% url 'dashboard:setting_dashboard' %}" class="btn btn-outline-secondary px-4">Discard
+                        Changes</a>
+                    <button type="submit" class="btn btn-primary-custom px-4">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
-
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-
-    <!-- Section 1: Profile Information -->
-    <div class="settings-card p-4 p-md-5 mb-4">
-        <div class="row align-items-center">
-            <!-- Left: Avatar -->
-            <div class="col-md-3 col-lg-2 d-flex flex-column align-items-center mb-4 mb-md-0">
-                <div class="rounded-circle overflow-hidden mb-3 border" style="width: 120px; height: 120px;">
-                    {% if profile.profile_picture %}
-                    <img src="{{ profile.profile_picture.url }}" alt="Avatar" class="w-100 h-100 object-fit-cover">
-                    {% elif user.profile_picture %}
-                    <img src="{{ user.profile_picture }}" alt="Avatar" class="w-100 h-100 object-fit-cover">
-                    {% else %}
-                    <img src="https://i.pravatar.cc/150?img=12" alt="Avatar" class="w-100 h-100 object-fit-cover">
-                    {% endif %}
-                </div>
-                <label for="{{ form.profile_image.id_for_label }}"
-                    class="fw-bold text-primary-blue text-decoration-none small mb-1" style="cursor:pointer;">Edit
-                    Photo</label>
-                {{ form.profile_image }}
-                {% if form.profile_image.errors %}
-                <div class="text-danger small mt-1">{{ form.profile_image.errors|striptags }}</div>
-                {% endif %}
-                <span class="text-secondary" style="font-size: 0.65rem;">JPG or PNG. Max 5MB.</span>
-            </div>
-
-            <!-- Right: Form Grid -->
-            <div class="col-md-9 col-lg-10 ps-md-4">
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <label class="settings-label" for="{{ form.full_name.id_for_label }}">Full Name</label>
-                        {{ form.full_name }}
-                        {% if form.full_name.errors %}<div class="text-danger small mt-1">{{
-                            form.full_name.errors|striptags }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="settings-label" for="{{ form.academic_title.id_for_label }}">Academic
-                            Title</label>
-                        {{ form.academic_title }}
-                        {% if form.academic_title.errors %}<div class="text-danger small mt-1">{{
-                            form.academic_title.errors|striptags }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="settings-label" for="{{ form.institution.id_for_label }}">Institution</label>
-                        {{ form.institution }}
-                        {% if form.institution.errors %}<div class="text-danger small mt-1">{{
-                            form.institution.errors|striptags }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="settings-label" for="{{ form.field_of_study.id_for_label }}">Field of
-                            Study</label>
-                        {{ form.field_of_study }}
-                        {% if form.field_of_study.errors %}<div class="text-danger small mt-1">{{
-                            form.field_of_study.errors|striptags }}</div>{% endif %}
-                    </div>
-                    <div class="col-12">
-                        <label class="settings-label" for="{{ form.bio.id_for_label }}">Bio</label>
-                        {{ form.bio }}
-                        {% if form.bio.errors %}<div class="text-danger small mt-1">{{ form.bio.errors|striptags }}
-                        </div>{% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Section 2: Account & Security -->
-    <div class="settings-card p-4 p-md-5 mb-4">
-        <div class="d-flex align-items-center gap-2 mb-4">
-            <i class="bi bi-shield-lock-fill text-primary-blue fs-5"></i>
-            <h5 class="fw-bold mb-0 text-dark">Account & Security</h5>
-        </div>
-
-        <div class="row g-4 mb-5">
-            <div class="col-md-6">
-                <label class="settings-label" for="{{ form.email.id_for_label }}">Email Address</label>
-                <div class="settings-input-wrapper">
-                    {{ form.email }}
-                    <input type="hidden" name="email" value="{{ user.email }}">
-                    <i class="bi bi-patch-check-fill settings-input-right-icon text-dark" style="opacity: 0.75;"></i>
-                </div>
-                {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors|striptags }}</div>{% endif %}
-            </div>
-            <div class="col-md-6">
-                <label class="settings-label" for="{{ form.new_password.id_for_label }}">Password</label>
-                <div class="settings-input-wrapper">
-                    {{ form.new_password }}
-                </div>
-                {% if form.new_password.errors %}<div class="text-danger small mt-1">{{
-                    form.new_password.errors|striptags }}</div>{% endif %}
-            </div>
-            <div class="col-md-6">
-                <label class="settings-label" for="{{ form.confirm_password.id_for_label }}">Confirm Password</label>
-                <div class="settings-input-wrapper">
-                    {{ form.confirm_password }}
-                </div>
-                {% if form.confirm_password.errors %}<div class="text-danger small mt-1">{{
-                    form.confirm_password.errors|striptags }}</div>{% endif %}
-            </div>
-        </div>
-
-        <hr class="border-secondary opacity-10 mb-4">
-
-        <h6 class="text-secondary fw-bold mb-3"
-            style="font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase;">Connected Accounts</h6>
-
-        <div class="connected-account-box d-flex align-items-center flex-wrap gap-3">
-            <div class="google-icon-box shadow-sm">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"
-                    style="width: 18px; height: 18px;">
-            </div>
-            <div class="flex-grow-1">
-                <h6 class="fw-bold text-dark mb-0">Google Account Connected</h6>
-                <p class="text-secondary small mb-0 lh-sm">Used for single sign-on and data syncing</p>
-            </div>
-            <div>
-                <span class="badge-connected">Connected</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bottom Action Bar -->
-    <div class="d-flex justify-content-end gap-3 align-items-center mt-5 mb-4">
-        <a href="{% url 'dashboard:setting_dashboard' %}" class="text-secondary fw-bold text-decoration-none"
-            style="font-size: 0.95rem;">Discard Changes</a>
-        <button type="submit" class="btn btn-primary-custom fw-bold px-4">Save Changes</button>
-    </div>
-</form>
 {% endblock dashboard_content %}
