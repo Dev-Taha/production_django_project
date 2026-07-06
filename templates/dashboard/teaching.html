@@ -4,72 +4,99 @@
 
 {% block dashboard_content %}
 
-<div class="mb-4">
-    <h3 class="fw-bold mb-1">{{ title }}</h3>
-    <p class="text-secondary">Fill in the course details below.</p>
-</div>
-
-<div class="dashboard-card p-4 p-md-5">
-    <form method="POST">
-        {% csrf_token %}
-
-        <div class="card shadow-sm rounded-3 mb-4 border-0">
-            <div class="card-header bg-white border-bottom py-3 px-4">
-                <h5 class="mb-1 fw-bold">Course Details</h5>
-                <p class="text-secondary small mb-0">Add the information about this course.</p>
-            </div>
-            <div class="card-body p-4">
-                <div class="row g-3">
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold small">Course Name</label>
-                        {{ form.course_name }}
-                        {% if form.course_name.errors %}
-                        <div class="text-danger small mt-1">{{ form.course_name.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold small">Semester</label>
-                        {{ form.semester }}
-                        {% if form.semester.errors %}
-                        <div class="text-danger small mt-1">{{ form.semester.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-8">
-                        <label class="form-label fw-semibold small">Description</label>
-                        {{ form.description }}
-                        {% if form.description.errors %}
-                        <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold small">Syllabus Link</label>
-                        {{ form.syllabus_link }}
-                        {% if form.syllabus_link.errors %}
-                        <div class="text-danger small mt-1">{{ form.syllabus_link.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
+<div class="course-page-shell">
+    <div class="card publication-card border-0">
+        <div class="card-header publication-card-header py-4">
+            <div class="d-flex align-items-center gap-3">
+                <div class="publication-icon-badge">
+                    <i class="bi bi-journal-bookmark"></i>
+                </div>
+                <div>
+                    <h4 class="mb-1">{{ title }}</h4>
+                    <p class="publication-card-subtitle mb-0">Fill in the course details below.</p>
                 </div>
             </div>
         </div>
+        <div class="card-body p-4 p-lg-5">
+            <form method="POST" class="publication-form">
+                {% csrf_token %}
 
-        {% if form.errors %}
-        <div class="alert alert-danger small">Please fix the errors above.</div>
-        {% endif %}
+                <div class="publication-section">
+                    <div class="publication-section-title">
+                        <i class="bi bi-card-list me-2"></i>Course Details
+                    </div>
+                    <div class="publication-section-subtitle">Add the information about this course.</div>
+                    <div class="row g-3">
 
-        <div class="d-flex justify-content-end gap-3 mt-2">
-            <a href="{% url 'dashboard:main_dashboard' %}"
-               class="btn btn-outline-secondary px-4">Cancel</a>
-            <button type="submit" class="btn btn-primary-custom px-4">
-                <i class="bi bi-check-lg me-1"></i> Save Course
-            </button>
+                        <div class="col-md-6">
+                            <div class="publication-field">
+                                <label class="form-label fw-semibold small">Course Name</label>
+                                <div class="input-icon-wrapper publication-input-wrapper">
+                                    <i class="bi bi-journals"></i>
+                                    {{ form.course_name }}
+                                </div>
+                                {% if form.course_name.errors %}
+                                <div class="text-danger small mt-1">{{ form.course_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="publication-field">
+                                <label class="form-label fw-semibold small">Semester</label>
+                                <div class="input-icon-wrapper publication-input-wrapper">
+                                    <i class="bi bi-calendar2-week"></i>
+                                    {{ form.semester }}
+                                </div>
+                                {% if form.semester.errors %}
+                                <div class="text-danger small mt-1">{{ form.semester.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="publication-field">
+                                <label class="form-label fw-semibold small">Description</label>
+                                <div class="input-icon-wrapper publication-input-wrapper">
+                                    <i class="bi bi-text-paragraph"></i>
+                                    {{ form.description }}
+                                </div>
+                                {% if form.description.errors %}
+                                <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="publication-field">
+                                <label class="form-label fw-semibold small">Syllabus Link</label>
+                                <div class="input-icon-wrapper publication-input-wrapper">
+                                    <i class="bi bi-link-45deg"></i>
+                                    {{ form.syllabus_link }}
+                                </div>
+                                {% if form.syllabus_link.errors %}
+                                <div class="text-danger small mt-1">{{ form.syllabus_link.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                {% if form.errors %}
+                <div class="alert alert-danger small">Please fix the errors above.</div>
+                {% endif %}
+
+                <div class="publication-actions">
+                    <a href="{% url 'dashboard:main_dashboard' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary-custom px-4">
+                        <i class="bi bi-check-lg me-1"></i> Save Course
+                    </button>
+                </div>
+
+            </form>
         </div>
-
-    </form>
+    </div>
 </div>
 
 {% endblock dashboard_content %}

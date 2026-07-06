@@ -176,6 +176,34 @@ h6 {
     min-width: 150px;
 }
 
+.publication-actions .btn-outline-secondary {
+    color: #2D1B69 !important;
+    background-color: #ffffff !important;
+    border-color: #DDD6FE !important;
+}
+
+.course-page-shell {
+    padding-top: 0.75rem !important;
+    padding-bottom: 1.25rem;
+}
+
+.course-page-shell .publication-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.course-page-shell .publication-input-wrapper input,
+.course-page-shell .publication-input-wrapper select,
+.course-page-shell .publication-input-wrapper textarea {
+    padding-left: 2.6rem;
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
+    border-radius: 10px;
+    border: 1px solid #E5E7EB;
+    background-color: #ffffff;
+}
+
 .hero-section {
     background: linear-gradient(135deg, #f8faff 0%, #f0f5ff 100%);
     padding: 6rem 0;
