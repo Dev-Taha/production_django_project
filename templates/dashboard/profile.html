@@ -323,10 +323,7 @@
                     </div>
                 </div>
 
-                {% if form.errors or pub_formset.errors or teach_formset.errors or edu_formset.errors or
-                cl_formset.errors %}
-                <div class="alert alert-danger small">Please fix the errors above.</div>
-                {% endif %}
+                {% if form.errors or pub_formset.errors or teach_formset.errors or edu_formset.errors or cl_formset.errors %} <div class="alert alert-danger small">Please fix the errors above.</div>{% endif %}
 
                 <div class="publication-actions">
                     <a href="{% url 'dashboard:main_dashboard' %}" class="btn btn-outline-secondary px-4">Cancel</a>
