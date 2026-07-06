@@ -616,10 +616,31 @@ h6 {
 .sidebar-link.active,
 .sidebar-step.active,
 .sidebar-step.bg-primary {
-    background-color: #0d6efd !important;
+    background-color: #2D1B69 !important;
     color: #ffffff !important;
-    border-color: #0d6efd !important;
+    border-color: #2D1B69 !important;
     font-weight: 600;
+}
+
+.sidebar-step {
+    background-color: #F9FAFB;
+    color: #6B7280;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.sidebar-step:hover {
+    background-color: #F5F3FF !important;
+    color: #2D1B69 !important;
+    border-color: #EDE9FE !important;
+}
+
+.sidebar-step.active .tracker-dot,
+.sidebar-step.bg-primary .tracker-dot {
+    border-color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
 }
 
 .sidebar-footer {
@@ -1672,13 +1693,23 @@ h6 {
     justify-content: center;
     flex-shrink: 0;
     font-size: .65rem;
-    transition: all .2s;
+    transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-step:hover .tracker-dot {
+    border-color: #7C3AED;
+    background-color: #ffffff;
+    color: #2D1B69;
 }
 
 .tracker-dot.done {
     background: #16a34a;
     border-color: #16a34a;
     color: #fff;
+}
+
+#completion-bar {
+    background-color: #7C3AED !important;
 }
 
 .wizard-section {
@@ -1788,20 +1819,29 @@ h6 {
 }
 
 .add-row-btn {
-    border: 1.5px dashed #7C3AED;
-    color: #7C3AED;
-    background: transparent;
+    border: 1px solid #DDD6FE;
+    color: #2D1B69;
+    background: #F5F3FF;
     border-radius: .5rem;
-    padding: .5rem 1.25rem;
+    padding: .6rem 1.25rem;
     font-weight: 600;
     font-size: .88rem;
-    transition: background .15s;
+    transition: all 0.2s ease;
     width: 100%;
     margin-top: .5rem;
+    cursor: pointer;
 }
 
 .add-row-btn:hover {
-    background: #F5F3FF;
+    background: #EDE9FE;
+    border-color: #C4B5FD;
+    color: #2D1B69;
+    transform: translateY(-1px);
+}
+
+.add-row-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.18);
 }
 
 .step2-submit-btn {
