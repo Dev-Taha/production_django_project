@@ -44,11 +44,11 @@ class RegisterForm(forms.ModelForm):
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
 
-        # التحقق من شروط الباسورد وهو ما زال نصاً عادياً ونقياً
+        # verify password constraints while it's still plain text
         if password and len(password) < 8:
             self.add_error('password', "Password must be at least 8 characters long.")
 
-        # مقارنة حقل الباسورد بحقل تأكيد الباسورد
+        # compare password field with confirm password field
         if password and confirm_password and password != confirm_password:
             self.add_error('confirm_password', "Passwords do not match.")
         

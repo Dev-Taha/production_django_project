@@ -14,7 +14,10 @@ from portfolios.models import Profile
 
 def login(request):
 
-    if 'user_id' in request.session: 
+    if 'user_id' in request.session:
+        user = User.objects.filter(id=request.session['user_id']).first()
+        if user and hasattr(user, 'profile') and user.profile.onboarding_completed:
+            return redirect('dashboard:main_dashboard')
         return redirect('portfolios:onboarding_one')
     context = {'login_form': LoginForm()}
 
@@ -29,6 +32,9 @@ def login(request):
                 logged_user = user_list[0]
                 if bcrypt.checkpw(password_input.encode(), logged_user.password.encode()):
                     request.session['user_id'] = logged_user.id
+                    profile = Profile.objects.filter(user=logged_user).first()
+                    if profile and profile.onboarding_completed:
+                        return redirect('dashboard:main_dashboard')
                     return redirect('portfolios:onboarding_one')
             
             messages.error(request, "Invalid Email or Password")
@@ -44,6 +50,9 @@ def login(request):
 def register(request):
 
     if 'user_id' in request.session:
+        user = User.objects.filter(id=request.session['user_id']).first()
+        if user and hasattr(user, 'profile') and user.profile.onboarding_completed:
+            return redirect('dashboard:main_dashboard')
         return redirect('portfolios:onboarding_one')
  
     context = {'reg_form': RegisterForm()}

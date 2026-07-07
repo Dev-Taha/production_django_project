@@ -295,7 +295,7 @@ def delete_teaching(request, teach_id):
 #         return redirect('accounts:login')
 
 #     user, profile = get_user_and_profile(request)
-
+        # restrict search to the user's profile only
 #     form = ProfileForm(
 #         request.POST  or None,
 #         request.FILES or None,
@@ -434,7 +434,7 @@ def edit_profile(request):
 #     }
     
 #     if query:
-#         # البحث مع حصر النتائج في بروفايل المستخدم فقط
+#         # restrict search to the user's profile only
 #         results['publications'] = Publication.objects.filter(
 #             profile=profile, 
 #             title__icontains=query

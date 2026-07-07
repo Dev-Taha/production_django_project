@@ -1,88 +1,3 @@
-// ── TEMPLATE DASHBOARD PREVIEW ──────────────────────────────────────────────
-//document.addEventListener("DOMContentLoaded", () => {
-//    const cards = document.querySelectorAll(".template-card");
-//    if (cards.length === 0) return; // Only execute on the templates dashboard
-//
-//    const previewTitle = document.getElementById("preview-title");
-//    const browserTitle = document.querySelector(".browser-url-bar span");
-//    const openNewTabBtn = document.getElementById("open-new-tab-btn");
-//    const selectedInput = document.getElementById("selected-template-input");
-//    const frame = document.getElementById('preview-frame');
-//
-//    const themes = [
-//        {
-//            id: 'classic-scholar',
-//            name: "Classic Scholar &mdash; Version 2.4.1",
-//            displayUrl: "preview.smartapp.io/scholar-template",
-//            src: "/portfolios/preview/academic-light/"
-//        },
-//        {
-//            id: 'modern-dark',
-//            name: "Modern Dark &mdash; Version 1.2.0",
-//            displayUrl: "preview.smartapp.io/modern-dark-02",
-//            src: "/portfolios/preview/modern-dark/"
-//        },
-//        {
-//            id: 'minimalist-lab',
-//            name: "Minimalist Lab &mdash; Version 3.1.2",
-//            displayUrl: "preview.smartapp.io/min-lab",
-//            src: "/portfolios/preview/modern-light/"
-//        },
-//        {
-//            id: 'executive-academic',
-//            name: "Executive Academic &mdash; Version 1.0.5",
-//            displayUrl: "preview.smartapp.io/exec-academic",
-//            src: "/portfolios/preview/academic-dark/"
-//        }
-//    ];
-//
-//    function setActiveCard(card, index) {
-//        cards.forEach(c => {
-//            c.classList.remove("active");
-//            const badge = c.querySelector(".template-badge-primary");
-//            if (badge) badge.remove();
-//        });
-//
-//        card.classList.add("active");
-//
-//        const titleDiv = card.querySelector(".d-flex.align-items-center");
-//        if (titleDiv && !titleDiv.querySelector(".template-badge-primary")) {
-//            const badge = document.createElement("span");
-//            badge.className = "template-badge-primary ms-2";
-//            badge.textContent = "ACTIVE";
-//            titleDiv.appendChild(badge);
-//        }
-//
-//        if (selectedInput) {
-//            selectedInput.value = card.dataset.template || themes[index]?.id || '';
-//        }
-//
-//        if (previewTitle) previewTitle.innerHTML = themes[index].name;
-//        if (browserTitle) browserTitle.textContent = themes[index].displayUrl;
-//        if (openNewTabBtn) openNewTabBtn.href = themes[index].src;
-//
-//        if (frame) {
-//            frame.style.opacity = '0';
-//            frame.src = themes[index].src;
-//            setTimeout(() => {
-//                frame.style.opacity = '1';
-//            }, 150);
-//        }
-//    }
-//
-//    cards.forEach((card, index) => {
-//        card.addEventListener("click", () => setActiveCard(card, index));
-//    });
-//
-//    const initialCard = document.querySelector('.template-card.active') || cards[0];
-//    const initialIndex = Array.from(cards).indexOf(initialCard);
-//    if (frame) {
-//        frame.style.transition = 'opacity 0.15s ease-in-out';
-//        if (openNewTabBtn) openNewTabBtn.href = themes[initialIndex]?.src || themes[0].src;
-//        setActiveCard(initialCard, initialIndex >= 0 ? initialIndex : 0);
-//    }
-//});
-
 
 // ── ONBOARDING 1: WIZARD CARD SELECTION ─────────────────────────────────────
 function selectCard(card) {
@@ -96,6 +11,397 @@ function selectCard(card) {
     }
 }
 
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+function showCvScanning(message) {
+    document.getElementById('cv-dropzone')?.classList.add('d-none');
+    document.getElementById('cv-scanning')?.classList.remove('d-none');
+    const msg = document.getElementById('cv-scan-message');
+    if (msg) msg.textContent = message;
+}
+
+function hideCvScanning() {
+    document.getElementById('cv-dropzone')?.classList.remove('d-none');
+    document.getElementById('cv-scanning')?.classList.add('d-none');
+    document.getElementById('cv-scan-error')?.classList.add('d-none');
+    document.getElementById('cv-retry-btn')?.classList.add('d-none');
+}
+
+function setCvError(message) {
+    const errorBox = document.getElementById('cv-scan-error');
+    if (errorBox) {
+        errorBox.textContent = message;
+        errorBox.classList.remove('d-none');
+    }
+    const retry = document.getElementById('cv-retry-btn');
+    if (retry) retry.classList.remove('d-none');
+}
+
+function showAutoFillToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'position-fixed bottom-0 end-0 m-4 p-3 rounded-3 bg-success text-white shadow';
+    toast.style.zIndex = '9999';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+}
+
+function setFormValue(selector, value) {
+    const el = document.querySelector(selector);
+    if (!el || value == null) return;
+    el.value = value;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function updateRepeatableSectionTitles() {
+    document.querySelectorAll('.edu-row').forEach((row, index) => {
+        const label = row.querySelector('.repeatable-card-title');
+        if (label) label.textContent = `Education #${index + 1}`;
+    });
+    document.querySelectorAll('.pub-row').forEach((row, index) => {
+        const label = row.querySelector('.repeatable-card-title');
+        if (label) label.textContent = `Publication #${index + 1}`;
+    });
+    document.querySelectorAll('.teach-row').forEach((row, index) => {
+        const label = row.querySelector('.repeatable-card-title');
+        if (label) label.textContent = `Teaching #${index + 1}`;
+    });
+}
+
+function addPublicationRow(item = {}) {
+    const c = document.getElementById('pub-container');
+    if (!c) return;
+    const div = document.createElement('div');
+    div.className = 'pub-row repeatable-card';
+    div.innerHTML = `
+        <div class="repeatable-card-header">
+            <div class="repeatable-card-title">Publication #${c.querySelectorAll('.pub-row').length + 1}</div>
+            <button type="button" class="remove-row-btn" onclick="this.closest('.pub-row').remove(); updateStepButtons(); updateRepeatableSectionTitles();"><i class="bi bi-trash"></i></button>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-8">
+                <label class="form-label fw-semibold small">Title <span class="text-danger">*</span></label>
+                <input type="text" name="pub_title[]" class="form-control pub-required" placeholder="Publication title" value="${item.title || ''}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold small">Date</label>
+                <input type="date" name="pub_date[]" class="form-control" value="${item.publication_date || ''}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">PDF Link</label>
+                <input type="url" name="pub_pdf[]" class="form-control" placeholder="https://..." value="${item.pdf_link || ''}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">GitHub Link</label>
+                <input type="url" name="pub_github[]" class="form-control" placeholder="https://github.com/..." value="${item.github_link || ''}">
+            </div>
+        </div>`;
+    c.appendChild(div);
+    syncValidation();
+}
+
+function addTeachingRow(item = {}) {
+    const c = document.getElementById('teach-container');
+    if (!c) return;
+    const div = document.createElement('div');
+    div.className = 'teach-row repeatable-card';
+    div.innerHTML = `
+        <div class="repeatable-card-header">
+            <div class="repeatable-card-title">Teaching #${c.querySelectorAll('.teach-row').length + 1}</div>
+            <button type="button" class="remove-row-btn" onclick="this.closest('.teach-row').remove(); updateStepButtons(); updateRepeatableSectionTitles();"><i class="bi bi-trash"></i></button>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">Course Name</label>
+                <input type="text" name="course_name[]" class="form-control" placeholder="e.g. Machine Learning 101" value="${item.course_name || ''}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">Semester</label>
+                <input type="text" name="semester[]" class="form-control" placeholder="e.g. Fall 2024" value="${item.semester || ''}">
+            </div>
+            <div class="col-md-8">
+                <label class="form-label fw-semibold small">Description</label>
+                <textarea name="course_desc[]" class="form-control" rows="2" placeholder="Course description…">${item.description || ''}</textarea>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold small">Syllabus Link</label>
+                <input type="url" name="syllabus_link[]" class="form-control" placeholder="https://..." value="${item.syllabus_link || ''}">
+            </div>
+        </div>`;
+    c.appendChild(div);
+    syncValidation();
+}
+
+function addEducationRow(item = {}) {
+    const c = document.getElementById('edu-container');
+    if (!c) return;
+    // try to use the empty form template if present
+    const empty = document.getElementById('edu-empty')?.innerHTML;
+    const totalInput = document.querySelector('input[name*="education"][name$="-TOTAL_FORMS"]');
+    let index = 0;
+    if (totalInput) {
+        index = parseInt(totalInput.value, 10);
+    }
+    if (empty) {
+        const html = empty.replace(/__prefix__/g, index);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'edu-row repeatable-card';
+        wrapper.innerHTML = `<div class="repeatable-card-header"><div class="repeatable-card-title">Education #${c.querySelectorAll('.edu-row').length + 1}</div><button type="button" class="remove-row-btn" onclick="this.closest('.edu-row').remove(); updateStepButtons(); updateRepeatableSectionTitles();"><i class="bi bi-trash"></i></button></div>${html}`;
+        c.appendChild(wrapper);
+        if (totalInput) totalInput.value = index + 1;
+        syncValidation();
+        updateRepeatableSectionTitles();
+        return;
+    }
+
+    const div = document.createElement('div');
+    div.className = 'edu-row repeatable-card';
+    div.innerHTML = `
+        <div class="repeatable-card-header">
+            <div class="repeatable-card-title">Education #${c.querySelectorAll('.edu-row').length + 1}</div>
+            <button type="button" class="remove-row-btn" onclick="this.closest('.edu-row').remove(); updateStepButtons(); updateRepeatableSectionTitles();"><i class="bi bi-trash"></i></button>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">Degree</label>
+                <input type="text" name="edu_degree[]" class="form-control" value="${item.degree || ''}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">Field of Study</label>
+                <input type="text" name="edu_field[]" class="form-control" value="${item.field_of_study || ''}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">Institution</label>
+                <input type="text" name="edu_institution[]" class="form-control" value="${item.institution || ''}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold small">Start Year</label>
+                <input type="number" name="edu_start[]" class="form-control" value="${item.start_year || ''}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold small">End Year</label>
+                <input type="number" name="edu_end[]" class="form-control" value="${item.end_year || ''}">
+            </div>
+            <div class="col-md-12">
+                <label class="form-label fw-semibold small">Description</label>
+                <textarea name="edu_description[]" class="form-control" rows="2">${item.description || ''}</textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">Honor</label>
+                <input type="text" name="edu_honor[]" class="form-control" value="${item.honor || ''}">
+            </div>
+        </div>`;
+    c.appendChild(div);
+    syncValidation();
+}
+
+function initializeOnboarding2FromSession() {
+    const rawData = sessionStorage.getItem('cv_extracted_data');
+    if (!rawData) return;
+    let extracted;
+    try {
+        extracted = JSON.parse(rawData);
+    } catch (err) {
+        return;
+    }
+    sessionStorage.removeItem('cv_extracted_data');
+
+    setFormValue('input[name="full_name"]', extracted.profile.full_name || '');
+    setFormValue('input[name="academic_title"]', extracted.profile.academic_title || '');
+    setFormValue('input[name="institution"]', extracted.profile.institution || '');
+    setFormValue('input[name="field_of_study"]', extracted.profile.field_of_study || '');
+    setFormValue('input[name="tagline"]', extracted.profile.tagline || '');
+    setFormValue('textarea[name="bio"]', extracted.profile.bio || '');
+    setFormValue('input[name="google_scholar"]', extracted.profile.google_scholar || '');
+    setFormValue('input[name="research_gate"]', extracted.profile.research_gate || '');
+
+    if (extracted.profile.research_interests) {
+        tags = extracted.profile.research_interests.split(/[\n,]+/).map(t => t.trim()).filter(Boolean);
+        renderTags();
+    }
+
+    if (Array.isArray(extracted.publications) && extracted.publications.length) {
+        const first = extracted.publications[0];
+        if (document.querySelector('input[name="publications-0-title"]')) {
+            setFormValue('input[name="publications-0-title"]', first.title || '');
+            setFormValue('input[name="publications-0-publication_date"]', first.publication_date || '');
+            setFormValue('input[name="publications-0-pdf_link"]', first.pdf_link || '');
+            setFormValue('input[name="publications-0-github_link"]', first.github_link || '');
+            extracted.publications.slice(1).forEach(item => {
+                addPub();
+                const rows = document.querySelectorAll('#pub-container .pub-row');
+                const idx = rows.length - 1;
+                setFormValue(`input[name="publications-${idx}-title"]`, item.title || '');
+                setFormValue(`input[name="publications-${idx}-publication_date"]`, item.publication_date || '');
+                setFormValue(`input[name="publications-${idx}-pdf_link"]`, item.pdf_link || '');
+                setFormValue(`input[name="publications-${idx}-github_link"]`, item.github_link || '');
+            });
+        } else {
+            extracted.publications.slice(1).forEach(addPublicationRow);
+        }
+    }
+
+    if (Array.isArray(extracted.teaching) && extracted.teaching.length) {
+        const first = extracted.teaching[0];
+        if (document.querySelector('input[name="teachings-0-course_name"]')) {
+            setFormValue('input[name="teachings-0-course_name"]', first.course_name || '');
+            setFormValue('input[name="teachings-0-semester"]', first.semester || '');
+            setFormValue('textarea[name="teachings-0-description"]', first.description || '');
+            setFormValue('input[name="teachings-0-syllabus_link"]', first.syllabus_link || '');
+            extracted.teaching.slice(1).forEach(item => {
+                addCourse();
+                const rows = document.querySelectorAll('#teach-container .teach-row');
+                const idx = rows.length - 1;
+                setFormValue(`input[name="teachings-${idx}-course_name"]`, item.course_name || '');
+                setFormValue(`input[name="teachings-${idx}-semester"]`, item.semester || '');
+                setFormValue(`textarea[name="teachings-${idx}-description"]`, item.description || '');
+                setFormValue(`input[name="teachings-${idx}-syllabus_link"]`, item.syllabus_link || '');
+            });
+        } else {
+            extracted.teaching.slice(1).forEach(addTeachingRow);
+        }
+    }
+
+    if (Array.isArray(extracted.education) && extracted.education.length) {
+        // try to populate existing formset fields (Django formset names) or fall back to addEducationRow
+        const degreeInputs = document.querySelectorAll('input[name$="-degree"]');
+        if (degreeInputs && degreeInputs.length) {
+            extracted.education.forEach((item, idx) => {
+                const suffix = `-${idx}-degree`;
+                const deg = document.querySelector(`input[name$="${suffix}"]`);
+                if (deg) {
+                    deg.value = item.degree || '';
+                    const field = document.querySelector(`input[name$="-${idx}-field_of_study"]`);
+                    if (field) field.value = item.field_of_study || '';
+                    const inst = document.querySelector(`input[name$="-${idx}-institution"]`);
+                    if (inst) inst.value = item.institution || '';
+                    const st = document.querySelector(`input[name$="-${idx}-start_year"]`);
+                    if (st) st.value = item.start_year || '';
+                    const en = document.querySelector(`input[name$="-${idx}-end_year"]`);
+                    if (en) en.value = item.end_year || '';
+                    const desc = document.querySelector(`textarea[name$="-${idx}-description"]`);
+                    if (desc) desc.value = item.description || '';
+                    const honor = document.querySelector(`input[name$="-${idx}-honor"]`);
+                    if (honor) honor.value = item.honor || '';
+                } else {
+                    addEducationRow(item);
+                }
+            });
+        } else {
+            extracted.education.forEach(addEducationRow);
+        }
+    }
+
+    const researchEntries = Array.isArray(extracted.research_interests_entries) ? extracted.research_interests_entries : [];
+    const filledCount = [
+        extracted.profile.full_name,
+        extracted.profile.academic_title,
+        extracted.profile.institution,
+        extracted.profile.field_of_study,
+        extracted.profile.tagline,
+        extracted.profile.bio,
+        extracted.profile.google_scholar,
+        extracted.profile.research_gate,
+        extracted.profile.research_interests,
+    ].filter(Boolean).length +
+        (Array.isArray(extracted.publications) ? extracted.publications.filter(item => item.title).length : 0) +
+        (Array.isArray(extracted.teaching) ? extracted.teaching.filter(item => item.course_name).length : 0) +
+        (Array.isArray(extracted.education) ? extracted.education.filter(item => item.degree || item.institution).length : 0) +
+        researchEntries.filter(item => item.title).length;
+
+    showAutoFillToast(`Auto-filled ${filledCount} fields ✅`);
+}
+
+function pollCvStatus(taskId) {
+    const messages = [
+        'Extracting your skills...',
+        'Extracting publications...',
+        'Analyzing academic background...',
+        'Auto-filling your data...'
+    ];
+    let index = 0;
+    const interval = setInterval(async () => {
+        showCvScanning(messages[index % messages.length]);
+        index += 1;
+        try {
+            const response = await fetch(`/api/onboarding/cv-status/${taskId}/`, {
+                credentials: 'same-origin',
+            });
+            if (!response.ok) {
+                throw new Error('Failed to connect to the server');
+            }
+            const result = await response.json();
+            if (result.status === 'completed') {
+                clearInterval(interval);
+                sessionStorage.setItem('cv_extracted_data', JSON.stringify(result.data));
+                window.location.href = '/portfolios/onboarding-two/';
+                return;
+            }
+            if (result.status === 'failed') {
+                clearInterval(interval);
+                setCvError(result.error || 'Failed to analyze the file. Please try again.');
+            }
+        } catch (err) {
+            clearInterval(interval);
+            setCvError(err.message || 'Failed to connect to the analysis server.');
+        }
+    }, 1500);
+}
+
+async function uploadCvFile(file) {
+    if (!file) return;
+    const allowed = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowed.includes(file.type) && !file.name.toLowerCase().endsWith('.docx')) {
+        setCvError('Unsupported file type. Please upload PDF or DOCX.');
+        return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+        setCvError('File size exceeds 10MB.');
+        return;
+    }
+    showCvScanning('Uploading the file to the server...');
+    const formData = new FormData();
+    formData.append('cv_file', file);
+    try {
+        const csrftoken = getCookie('csrftoken');
+        const response = await fetch('/api/onboarding/upload-cv/', {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin',
+            headers: csrftoken ? { 'X-CSRFToken': csrftoken } : {},
+        });
+
+        const contentType = (response.headers.get('content-type') || '').toLowerCase();
+        if (!response.ok) {
+            if (contentType.includes('application/json')) {
+                const payload = await response.json().catch(() => null);
+                throw new Error(payload?.error || 'Upload failed.');
+            }
+            const text = await response.text().catch(() => null);
+            throw new Error(text ? 'Upload failed: server returned an unexpected response.' : 'Upload failed.');
+        }
+
+        if (!contentType.includes('application/json')) {
+            const text = await response.text().catch(() => null);
+            throw new Error('Server error: expected JSON response.');
+        }
+
+        const data = await response.json();
+        if (data.task_id) {
+            pollCvStatus(data.task_id);
+        } else {
+            throw new Error('No task ID received.');
+        }
+    } catch (err) {
+        setCvError(err.message || 'An error occurred during upload.');
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const wizardCards = document.querySelectorAll('.wizard-card');
     wizardCards.forEach(card => {
@@ -103,12 +409,44 @@ document.addEventListener("DOMContentLoaded", () => {
             selectCard(this);
         });
     });
+
+    const dropzone = document.getElementById('cv-dropzone');
+    const fileInput = document.getElementById('cv-file-input');
+    const retryButton = document.getElementById('cv-retry-btn');
+    if (dropzone) {
+        dropzone.addEventListener('click', () => fileInput?.click());
+        dropzone.addEventListener('dragover', event => {
+            event.preventDefault();
+            dropzone.classList.add('drag-over');
+        });
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('drag-over');
+        });
+        dropzone.addEventListener('drop', event => {
+            event.preventDefault();
+            dropzone.classList.remove('drag-over');
+            const file = event.dataTransfer.files[0];
+            if (file) uploadCvFile(file);
+        });
+    }
+    if (fileInput) {
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files?.[0];
+            if (file) uploadCvFile(file);
+        });
+    }
+    if (retryButton) {
+        retryButton.addEventListener('click', () => {
+            document.getElementById('cv-scan-error')?.classList.add('d-none');
+            hideCvScanning();
+        });
+    }
 });
 
 
 // ── ONBOARDING 2: MULTI-STEP WIZARD ─────────────────────────────────────────
-const TOTAL = 6;
-const sectionDone = new Array(TOTAL).fill(false);
+let TOTAL = 0;
+let sectionDone = [];
 let current = 0;
 
 function showSection(idx) {
@@ -139,7 +477,7 @@ function sectionValid(idx) {
     const sec = document.getElementById('section-' + idx);
     if (!sec) return true;
     let ok = true;
-    sec.querySelectorAll('input[required], textarea[required], input.pub-required, textarea.pub-required, input.teach-required, textarea.teach-required').forEach(el => {
+    sec.querySelectorAll('input[required], textarea[required]').forEach(el => {
         const value = el.type === 'checkbox' || el.type === 'radio' ? el.checked : el.value.trim();
         if (!value) {
             el.classList.add('is-invalid');
@@ -151,47 +489,66 @@ function sectionValid(idx) {
     return ok;
 }
 
+function validateEducationSection() {
+    const educationRows = document.querySelectorAll('#edu-container .edu-row');
+    let hasInvalidRow = false;
+
+    educationRows.forEach(row => {
+        const startYearInput = row.querySelector('input[name$="-start_year"], input[name$="start_year"]');
+        const inlineError = row.querySelector('.education-inline-error');
+        const otherFields = Array.from(row.querySelectorAll('input, textarea')).filter(el => {
+            if (!el.name) return false;
+            if (el.name.includes('start_year') || el.name.includes('end_year')) return false;
+            if (el.type === 'hidden') return false;
+            return el.value.trim() !== '';
+        });
+
+        const hasAnyContent = otherFields.length > 0;
+        const hasStartYear = !!(startYearInput && startYearInput.value && String(startYearInput.value).trim() !== '');
+
+        if (hasAnyContent && !hasStartYear) {
+            hasInvalidRow = true;
+            startYearInput?.classList.add('is-invalid');
+            if (inlineError) {
+                inlineError.textContent = 'Start year is required for this entry.';
+                inlineError.classList.remove('d-none');
+            }
+        } else {
+            startYearInput?.classList.remove('is-invalid');
+            if (inlineError) {
+                inlineError.textContent = '';
+                inlineError.classList.add('d-none');
+            }
+        }
+    });
+
+    return !hasInvalidRow;
+}
+
 function nextSection(idx) {
-    if (!sectionValid(idx)) return;
-    markDone(idx);
+    if (idx === 2) {
+        if (!validateEducationSection()) {
+            console.warn('Education validation failed, staying on section', idx);
+            showSection(2);
+            return;
+        }
+    }
+    if (!sectionValid(idx)) {
+        console.warn('Section validation prevented navigation', idx);
+        return;
+    }
     if (idx + 1 < TOTAL) showSection(idx + 1);
 }
 
 function prevSection(idx) {
-    if (idx > 0) showSection(idx - 1);
-}
-
-function markDone(idx) {
-    sectionDone[idx] = true;
-    const dot = document.getElementById('dot-' + idx);
-    if (dot) {
-        dot.classList.add('done');
-        dot.innerHTML = '<i class="bi bi-check-lg" style="font-size:.65rem;"></i>';
+    if (idx > 0) {
+        showSection(idx - 1);
     }
-    updateProgress();
-    checkAllDone();
 }
 
-function updateProgress() {
-    const done = sectionDone.filter(Boolean).length;
-    const pct = Math.round((done / TOTAL) * 100);
-    const bar = document.getElementById('completion-bar');
-    if (bar) {
-        bar.style.width = pct + '%';
-        bar.setAttribute('aria-valuenow', pct);
-    }
-    const pctText = document.getElementById('completion-pct');
-    if (pctText) pctText.textContent = pct + '% complete';
-}
-
-function checkAllDone() {
-    const btn = document.getElementById('go-step3-btn');
-    if (!btn) return;
-    btn.disabled = !sectionDone.every(Boolean);
-}
 
 function getSectionRequiredFields(section) {
-    return section.querySelectorAll('input[required], textarea[required], select[required], input.pub-required, textarea.pub-required, input.teach-required, textarea.teach-required');
+    return section.querySelectorAll('input[required], textarea[required], select[required]');
 }
 
 function updateStepButtons() {
@@ -199,72 +556,107 @@ function updateStepButtons() {
         const nextButton = document.querySelector(`[data-wizard-next='${idx}']`);
         if (!nextButton) return;
         const requiredFields = getSectionRequiredFields(section);
+        let done = false;
         if (requiredFields.length === 0) {
             nextButton.disabled = false;
-            return;
+            done = sectionHasContent(section);
+        } else {
+            const valid = Array.from(requiredFields).every(el => {
+                if (el.type === 'checkbox' || el.type === 'radio') {
+                    return el.checked;
+                }
+                return String(el.value || '').trim();
+            });
+            nextButton.disabled = !valid;
+            done = valid;
         }
-        const valid = Array.from(requiredFields).every(el => {
-            if (el.type === 'checkbox' || el.type === 'radio') {
-                return el.checked;
-            }
-            return el.value.trim();
-        });
-        nextButton.disabled = !valid;
+        setSectionDone(idx, done);
     });
 }
 
-function updateFinalContactState() {
-    const scholar = document.querySelector('input[name="google_scholar"]');
-    const research = document.querySelector('input[name="research_gate"]');
-    const submitBtn = document.getElementById('go-step3-btn');
-    const continueBtn = document.getElementById('continue-btn');
-    const dot = document.getElementById('dot-5');
-    const isValid = Boolean(scholar?.value.trim() || research?.value.trim());
-
-    if (submitBtn) {
-        submitBtn.disabled = !isValid;
-    }
-
-    if (dot) {
-        if (isValid) {
-            dot.classList.add('done');
-            dot.innerHTML = '<i class="bi bi-check-lg" style="font-size:.65rem;"></i>';
-            sectionDone[5] = true;
-        } else {
-            dot.classList.remove('done');
-            dot.innerHTML = '';
-            sectionDone[5] = false;
+function sectionHasContent(section) {
+    if (!section) return false;
+    const inputs = section.querySelectorAll('input, textarea, select');
+    for (const el of inputs) {
+        if (!el.name) continue;
+        // skip management/formset hidden inputs
+        if (el.type === 'hidden' && (el.name.indexOf('TOTAL_FORMS') !== -1 || el.name.indexOf('INITIAL_FORMS') !== -1 || el.name.indexOf('__prefix__') !== -1)) continue;
+        if (el.type === 'checkbox' || el.type === 'radio') {
+            if (el.checked) return true;
+            continue;
         }
+        if (el.value && String(el.value).trim() !== '') return true;
     }
-
-    if (continueBtn) {
-        continueBtn.classList.toggle('disabled-btn', !isValid);
-        continueBtn.classList.toggle('enabled-btn', isValid);
-        continueBtn.setAttribute('aria-disabled', isValid ? 'false' : 'true');
+    // also check legacy repeatable containers for non-formset setups
+    const pubRows = section.querySelectorAll('#pub-container .pub-row, .pub-row');
+    for (const r of pubRows) {
+        const v = r.querySelector('input, textarea');
+        if (v && String(v.value || '').trim() !== '') return true;
     }
+    const teachRows = section.querySelectorAll('#teach-container .teach-row, .teach-row');
+    for (const r of teachRows) {
+        const v = r.querySelector('input, textarea');
+        if (v && String(v.value || '').trim() !== '') return true;
+    }
+    return false;
+}
 
+function setSectionDone(idx, done) {
+    sectionDone[idx] = !!done;
+    const dot = document.getElementById('dot-' + idx);
+    if (!dot) return;
+    if (done) {
+        dot.classList.add('done');
+        dot.innerHTML = '<i class="bi bi-check-lg" style="font-size:.65rem;"></i>';
+    } else {
+        dot.classList.remove('done');
+        dot.innerHTML = '';
+    }
     updateProgress();
     checkAllDone();
 }
 
+function updateProgress() {
+    const completionPct = document.getElementById('completion-pct');
+    const completionBar = document.getElementById('completion-bar');
+    const totalSteps = TOTAL || document.querySelectorAll('.sidebar-step').length || 0;
+    if (!completionPct || !completionBar || totalSteps === 0) return;
+
+    const completedSteps = sectionDone.filter(Boolean).length;
+    const percent = Math.round((completedSteps / totalSteps) * 100);
+
+    completionPct.textContent = `${percent}% complete`;
+    completionBar.style.width = `${percent}%`;
+    completionBar.setAttribute('aria-valuenow', percent);
+}
+
+function checkAllDone() {
+    return sectionDone.length > 0 && sectionDone.every(Boolean);
+}
+
+function updateFinalContactState() {
+    const submitBtn = document.getElementById('go-step3-btn');
+    if (submitBtn) {
+        submitBtn.disabled = false;
+    }
+    checkAllDone();
+}
+
+function handleWizardFieldChange(event) {
+    const el = event.target;
+    if (el.type !== 'checkbox' && el.type !== 'radio' && el.value && String(el.value).trim()) {
+        el.classList.remove('is-invalid');
+    }
+    updateStepButtons();
+    updateFinalContactState();
+}
+
 function syncValidation() {
-    document.querySelectorAll('input[required], textarea[required], input.pub-required, textarea.pub-required, input.teach-required, textarea.teach-required').forEach(el => {
-        el.removeEventListener('input', updateStepButtons);
-        el.removeEventListener('change', updateStepButtons);
-        el.addEventListener('input', () => {
-            if (el.value.trim()) {
-                el.classList.remove('is-invalid');
-            }
-            updateStepButtons();
-            updateFinalContactState();
-        });
-        el.addEventListener('change', () => {
-            if (el.value.trim()) {
-                el.classList.remove('is-invalid');
-            }
-            updateStepButtons();
-            updateFinalContactState();
-        });
+    document.querySelectorAll('.wizard-section input, .wizard-section textarea, .wizard-section select').forEach(el => {
+        el.removeEventListener('input', handleWizardFieldChange);
+        el.removeEventListener('change', handleWizardFieldChange);
+        el.addEventListener('input', handleWizardFieldChange);
+        el.addEventListener('change', handleWizardFieldChange);
     });
 
     document.querySelectorAll('input[name="google_scholar"], input[name="research_gate"]').forEach(el => {
@@ -329,7 +721,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Photo preview listener
-    const fileInput = document.querySelector('input[type="file"]');
+    const fileInput = document.getElementById('profile-image-input') || document.querySelector('input[type="file"]');
     if (fileInput) {
         fileInput.addEventListener('change', function () {
             const f = this.files[0];
@@ -370,15 +762,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
     syncValidation();
 
+    // Debug: log form data when submit is clicked to help diagnose client-side issues
+    const step2Form = document.getElementById('step2-form');
+    const submitBtn = document.getElementById('go-step3-btn');
+    if (submitBtn && step2Form) {
+        submitBtn.addEventListener('click', (e) => {
+            try {
+                console.log('SUBMIT CLICKED', new FormData(step2Form));
+            } catch (err) {
+                console.log('SUBMIT CLICKED - could not build FormData', err);
+            }
+        });
+    }
+
     const addPubButton = document.querySelector('[data-add-pub]');
     if (addPubButton) addPubButton.addEventListener('click', addPub);
 
     const addCourseButton = document.querySelector('[data-add-course]');
     if (addCourseButton) addCourseButton.addEventListener('click', addCourse);
+    const addEduButton = document.querySelector('[data-add-edu]');
+    if (addEduButton) addEduButton.addEventListener('click', () => addEducationRow());
 
-    // Init wizard on onboarding2 page
+    // Init wizard on onboarding2 page and autofill if the CV extractor returned data.
     if (document.getElementById('step2-form')) {
-        showSection(0);
+        // compute TOTAL based on sidebar items
+        TOTAL = document.querySelectorAll('.sidebar-step').length || 0;
+        sectionDone = new Array(TOTAL).fill(false);
+
+        initializeOnboarding2FromSession();
+        const shouldFocusEducation = document.querySelector('[data-focus-education]')?.dataset.focusEducation === 'true';
+        if (shouldFocusEducation) {
+            showSection(2);
+        } else {
+            showSection(0);
+        }
         updateStepButtons();
     }
 });
@@ -423,6 +840,22 @@ let courseCount = 1;
 function addCourse() {
     const c = document.getElementById('teach-container');
     if (!c) return;
+    const totalInput = document.querySelector('input[name="teachings-TOTAL_FORMS"]');
+    let index = 0;
+    if (totalInput) index = parseInt(totalInput.value, 10);
+    const empty = document.getElementById('teach-empty')?.innerHTML;
+    if (empty) {
+        const html = empty.replace(/__prefix__/g, index);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'teach-row repeatable-card';
+        wrapper.innerHTML = `<div class="repeatable-card-header"><div class="repeatable-card-title">Teaching #${c.querySelectorAll('.teach-row').length + 1}</div><button type="button" class="remove-row-btn" onclick="this.closest('.teach-row').remove(); updateStepButtons(); updateRepeatableSectionTitles();"><i class="bi bi-trash"></i></button></div><div class="row g-3">${html}</div>`;
+        c.appendChild(wrapper);
+        if (totalInput) totalInput.value = index + 1;
+        syncValidation();
+        updateRepeatableSectionTitles();
+        return;
+    }
+
     const div = document.createElement('div');
     div.className = 'teach-row';
     div.id = 'teach-' + courseCount;
@@ -430,12 +863,12 @@ function addCourse() {
         <button type="button" class="remove-row-btn" onclick="this.closest('.teach-row').remove(); updateStepButtons();"><i class="bi bi-trash"></i></button>
         <div class="row g-3">
             <div class="col-md-6">
-                <label class="form-label fw-semibold small">Course Name <span class="text-danger">*</span></label>
-                <input type="text" name="course_name[]" class="form-control teach-required" placeholder="e.g. Machine Learning 101">
+                <label class="form-label fw-semibold small">Course Name</label>
+                <input type="text" name="course_name[]" class="form-control" placeholder="e.g. Machine Learning 101">
             </div>
             <div class="col-md-6">
                 <label class="form-label fw-semibold small">Semester</label>
-                <input type="text" name="teachingscol[]" class="form-control" placeholder="e.g. Fall 2024">
+                <input type="text" name="semester[]" class="form-control" placeholder="e.g. Fall 2024">
             </div>
             <div class="col-md-8">
                 <label class="form-label fw-semibold small">Description</label>
@@ -511,19 +944,19 @@ function refreshPreview() {
 
 
 
-    // Filter function — runs every time the user types in the filter input.
-    // Steps:
-    // 1. Get the typed text and convert to lowercase
-    // 2. Loop through every <tr class="asset-row">
-    // 3. Compare the typed text against data-title on each row
-    // 4. Show the row if it matches, hide it if it doesn't
-    // 5. If nothing matches at all, show the "No results found" row
+// Filter function — runs every time the user types in the filter input.
+// Steps:
+// 1. Get the typed text and convert to lowercase
+// 2. Loop through every <tr class="asset-row">
+// 3. Compare the typed text against data-title on each row
+// 4. Show the row if it matches, hide it if it doesn't
+// 5. If nothing matches at all, show the "No results found" row
 
 function filterAssets(query) {
-    const q     = query.toLowerCase().trim();  //  the search text
-    const rows  = document.querySelectorAll('.asset-row');  // all table rows
+    const q = query.toLowerCase().trim();  //  the search text
+    const rows = document.querySelectorAll('.asset-row');  // all table rows
     const noRes = document.getElementById('no-results');    // the "no results" row
-    let   found = 0;  // counter for how many rows are visible
+    let found = 0;  // counter for how many rows are visible
 
     rows.forEach(row => {
         // data-title holds the lowercase title set  ("machine learning 101")

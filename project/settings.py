@@ -27,12 +27,35 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--1y!)lfbux@x17%g&dr(^ox$ia4*)i427x(#2qy7$)$099p(vp'
+# Must be set via environment variable (loaded from .env in development)
+SECRET_KEY = os.getenv(
+    'SECRET_KEY',
+    'django-insecure-changeme'  # Placeholder - will fail if not set in production
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Set DEBUG=False in production environment to enable ALLOWED_HOSTS validation
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS configuration:
+#  - Development (DEBUG=True): Automatically includes localhost, 127.0.0.1, testserver
+#  - Production (DEBUG=False): Must be set via ALLOWED_HOSTS environment variable
+#    Format: comma-separated list of hostnames (no spaces, no protocol prefix)
+#    Example: ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com,api.yourdomain.com
+if DEBUG:
+    # Development: permissive for local testing
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
+else:
+    # Production: strict - must come from environment variable
+    # This will fail loudly if ALLOWED_HOSTS is not set, preventing accidental misconfiguration
+    allowed_hosts_str = os.getenv('ALLOWED_HOSTS', '')
+    if not allowed_hosts_str:
+        raise ValueError(
+            'ALLOWED_HOSTS environment variable must be set in production (DEBUG=False). '
+            'Format: comma-separated hostnames (no spaces or protocol). '
+            'Example: yourdomain.com,www.yourdomain.com'
+        )
+    ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',')]
 
 
 # Application definition
@@ -56,6 +79,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'portfolios.middleware.OnboardingMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -111,7 +135,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
-TOGETHER_MODEL = "OpenAI GPT-OSS 120B"
+TOGETHER_MODEL = "openai/gpt-oss-120b"
 
 
 # Internationalization
@@ -152,3 +176,30 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '[%(levelname)s] %(asctime)s %(name)s: %(message)s',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}

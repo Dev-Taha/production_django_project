@@ -4,47 +4,57 @@
 
 
 {% block title %}
-    Onboarding
+Onboarding
 {% endblock title %}
 
 
 {% block content %}
-    <div class="steps-wrapper">
-        <!-- Navbar -->
-        <nav class="steps-navbar">
-            <a href="" class="steps-brand">
-                <img src="{% static 'img/icon.png' %}" alt="SmartWeb Logo">
-                <span>SmartWeb</span>
-            </a>
-    
-            <!-- Steps Indicator -->
-            <div class="steps-indicator">
-                <div class="step-item {% block step1_active %}{% endblock %}">
-                    <div class="step-circle">1</div>
-                    <span>Get Started</span>
-                </div>
-                <div class="step-line"></div>
-                <div class="step-item {% block step2_active %}{% endblock %}">
-                    <div class="step-circle">2</div>
-                    <span>Academic Info</span>
-                </div>
-                <div class="step-line"></div>
-                <div class="step-item {% block step3_active %}{% endblock %}">
-                    <div class="step-circle">3</div>
-                    <span>Template Selection</span>
-                </div>
+<div class="steps-wrapper">
+    <!-- Navbar -->
+    <nav class="steps-navbar">
+        <a href="" class="steps-brand">
+            <img src="{% static 'img/icon.png' %}" alt="SmartWeb Logo">
+            <span>SmartWeb</span>
+        </a>
+
+        <!-- Steps Indicator -->
+        <div class="steps-indicator">
+            <div class="step-item {% block step1_active %}{% endblock %}">
+                <div class="step-circle">1</div>
+                <span>Get Started</span>
             </div>
-    
-            <!-- Actions -->
-            <div class="steps-actions">
-                {% block button %}
-    
-                {% endblock button %}
+            <div class="step-line"></div>
+            <div class="step-item {% block step2_active %}{% endblock %}">
+                <div class="step-circle">2</div>
+                <span>Academic Info</span>
             </div>
-        </nav>
-    
-        <!-- Main Content -->
-        {% block step_content %}
-        {% endblock step_content %}
-    </div><!-- /steps-wrapper -->
+            <div class="step-line"></div>
+            <div class="step-item {% block step3_active %}{% endblock %}">
+                <div class="step-circle">3</div>
+                <span>Template Selection</span>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="steps-actions">
+            {% block button %}
+
+            {% endblock button %}
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    {% block step_content %}
+    {% if messages %}
+    <div class="container mt-4 px-4">
+        {% for msg in messages %}
+        <div class="alert alert-danger py-3 mb-3 rounded-3 border-0 shadow-sm" role="alert">
+            <div class="fw-semibold">Please review the form</div>
+            <div class="small mt-1">{{ msg }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endblock step_content %}
+</div><!-- /steps-wrapper -->
 {% endblock %}

@@ -4,312 +4,336 @@
 
 {% block dashboard_content %}
 
-<div class="mb-4">
-    <h3 class="fw-bold mb-1">Edit Profile</h3>
-    <p class="text-secondary">Update your academic information.</p>
-</div>
-
-<div class="dashboard-card p-4 p-md-5">
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-
-    <!-- ══ Personal Information ══════════════════════════════════════ -->
-    <div class="card shadow-sm rounded-3 mb-4 border-0">
-        <div class="card-header bg-white border-bottom py-3 px-4">
-            <h5 class="mb-1 fw-bold">Personal Information</h5>
-            <p class="text-secondary small mb-0">Update your academic profile details.</p>
-        </div>
-        <div class="card-body p-4">
-            <div class="row g-4 align-items-center mb-4">
-                <div class="col-md-2 text-center">
-                    {% if profile.profile_image %}
-                    <img src="{{ profile.profile_image.url }}" class="rounded-circle"
-                        style="width:90px;height:90px;object-fit:cover">
-                    {% else %}
-                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto"
-                        style="width:90px;height:90px">
-                        <i class="bi bi-person-fill text-white fs-2"></i>
-                    </div>
-                    {% endif %}
+<div class="profile-page-shell">
+    <div class="card publication-card border-0">
+        <div class="card-header publication-card-header py-4">
+            <div class="d-flex align-items-center gap-3">
+                <div class="publication-icon-badge">
+                    <i class="bi bi-person-circle"></i>
                 </div>
-                <div class="col-md-10">
-                    <label class="form-label fw-semibold small">Profile Picture</label>
-                    {{ form.profile_image }}
-                    <div class="text-secondary mt-1" style="font-size:.75rem">JPG or PNG. Max 5MB.</div>
-                </div>
-            </div>
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold small">Full Name</label>
-                    {{ form.full_name }}
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold small">Academic Title</label>
-                    {{ form.academic_title }}
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold small">Institution</label>
-                    {{ form.institution }}
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold small">Field of Study</label>
-                    {{ form.field_of_study }}
-                </div>
-                <div class="col-12">
-                    <label class="form-label fw-semibold small">Biography</label>
-                    {{ form.bio }}
+                <div>
+                    <h4 class="mb-1">Edit Profile</h4>
+                    <p class="publication-card-subtitle mb-0">Update your academic profile information.</p>
                 </div>
             </div>
         </div>
+        <div class="card-body p-4 p-lg-5">
+            <form method="POST" enctype="multipart/form-data" class="publication-form">
+                {% csrf_token %}
+
+                <!-- ══ Personal Information ══════════════════════════════════════ -->
+                <div class="card shadow-sm rounded-3 mb-4 border-0 profile-section-card">
+                    <div class="card-header profile-section-header border-bottom py-3 px-4">
+                        <h5 class="mb-1 fw-bold">
+                            <i class="bi bi-person-badge me-2"></i>Personal Information
+                        </h5>
+                        <p class="text-secondary small mb-0">Update your academic profile details.</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-4 align-items-center mb-4">
+                            <div class="col-md-2 text-center">
+                                {% if profile.profile_image %}
+                                <img src="{{ profile.profile_image.url }}" class="rounded-circle"
+                                    style="width:90px;height:90px;object-fit:cover">
+                                {% else %}
+                                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto"
+                                    style="width:90px;height:90px">
+                                    <i class="bi bi-person-fill text-white fs-2"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-10">
+                                <label class="form-label fw-semibold small">Profile Picture</label>
+                                {{ form.profile_image }}
+                                <div class="text-secondary mt-1" style="font-size:.75rem">JPG or PNG. Max 5MB.</div>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">Full Name</label>
+                                {{ form.full_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">Academic Title</label>
+                                {{ form.academic_title }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">Institution</label>
+                                {{ form.institution }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">Field of Study</label>
+                                {{ form.field_of_study }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small">Biography</label>
+                                {{ form.bio }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ══ Research Interests ════════════════════════════════════════ -->
+                <div class="card shadow-sm rounded-3 mb-4 border-0 profile-section-card">
+                    <div class="card-header profile-section-header border-bottom py-3 px-4">
+                        <h5 class="mb-1 fw-bold">
+                            <i class="bi bi-bullseye me-2"></i>Research Interests
+                        </h5>
+                        <p class="text-secondary small mb-0">Describe the topics that define your expertise.</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="tag-input-box" id="tag-box"></div>
+                        <input type="hidden" name="research_interests" id="research-interests-val"
+                            value="{{ profile.research_interests }}">
+                        <p class="text-secondary small mt-2">Press Enter or comma to save each keyword.</p>
+                    </div>
+                </div>
+
+                <!-- ══ Publications ══════════════════════════════════════════════ -->
+                <div class="card shadow-sm rounded-3 mb-4 border-0 profile-section-card">
+                    <div class="card-header profile-section-header border-bottom py-3 px-4">
+                        <h5 class="mb-1 fw-bold">
+                            <i class="bi bi-file-earmark-text me-2"></i>Publications
+                        </h5>
+                        <p class="text-secondary small mb-0">Manage your saved publications.</p>
+                    </div>
+                    <div class="card-body p-4">
+                        {{ pub_formset.management_form }}
+                        {% for pub_form in pub_formset %}
+                        {% for hidden in pub_form.hidden_fields %}{{ hidden }}{% endfor %}
+                        <div
+                            class="p-3 rounded-3 mb-3 {% if pub_form.instance.pk %}bg-light{% else %}bg-white border{% endif %}">
+                            {% if pub_form.instance.pk %}
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="fw-semibold">{{ pub_form.instance.title|truncatechars:50 }}</span>
+                                <div class="d-flex align-items-center gap-2">
+                                    {{ pub_form.DELETE }}
+                                    <label class="text-danger small mb-0">Delete</label>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small">Title</label>
+                                    {{ pub_form.title }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small">Publication Date</label>
+                                    {{ pub_form.publication_date }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small">PDF Link</label>
+                                    {{ pub_form.pdf_link }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small">GitHub Link</label>
+                                    {{ pub_form.github_link }}
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold small">Description</label>
+                                    {{ pub_form.description }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- ══ Teaching ══════════════════════════════════════════════════ -->
+                <div class="card shadow-sm rounded-3 mb-4 border-0 profile-section-card">
+                    <div class="card-header profile-section-header border-bottom py-3 px-4">
+                        <h5 class="mb-1 fw-bold">
+                            <i class="bi bi-journal-bookmark me-2"></i>Teaching
+                        </h5>
+                        <p class="text-secondary small mb-0">Manage your saved courses.</p>
+                    </div>
+                    <div class="card-body p-4">
+                        {{ teach_formset.management_form }}
+                        {% for teach_form in teach_formset %}
+                        {% for hidden in teach_form.hidden_fields %}{{ hidden }}{% endfor %}
+                        <div
+                            class="p-3 rounded-3 mb-3 {% if teach_form.instance.pk %}bg-light{% else %}bg-white border{% endif %}">
+                            {% if teach_form.instance.pk %}
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="fw-semibold">{{ teach_form.instance.course_name }}</span>
+                                <div class="d-flex align-items-center gap-2">
+                                    {{ teach_form.DELETE }}
+                                    <label class="text-danger small mb-0">Delete</label>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small">Course Name</label>
+                                    {{ teach_form.course_name }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small">Semester</label>
+                                    {{ teach_form.semester }}
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label fw-semibold small">Description</label>
+                                    {{ teach_form.description }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold small">Syllabus Link</label>
+                                    {{ teach_form.syllabus_link }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- ══ Education ═════════════════════════════════════════════════ -->
+                <div class="card shadow-sm rounded-3 mb-4 border-0 profile-section-card">
+                    <div class="card-header profile-section-header border-bottom py-3 px-4">
+                        <h5 class="mb-1 fw-bold">
+                            <i class="bi bi-mortarboard me-2"></i>Education
+                        </h5>
+                        <p class="text-secondary small mb-0">Manage your academic degrees and qualifications.</p>
+                    </div>
+                    <div class="card-body p-4">
+                        {{ edu_formset.management_form }}
+                        {% for edu_form in edu_formset %}
+                        {% for hidden in edu_form.hidden_fields %}{{ hidden }}{% endfor %}
+                        <div
+                            class="p-3 rounded-3 mb-3 {% if edu_form.instance.pk %}bg-light{% else %}bg-white border{% endif %}">
+                            {% if edu_form.instance.pk %}
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="fw-semibold">
+                                    {{ edu_form.instance.degree }} — {{ edu_form.instance.institution }}
+                                    {% if edu_form.instance.honor %}
+                                    <span class="badge bg-warning text-dark ms-2" style="font-size:.7rem">
+                                        {{ edu_form.instance.honor }}
+                                    </span>
+                                    {% endif %}
+                                </span>
+                                <div class="d-flex align-items-center gap-2">
+                                    {{ edu_form.DELETE }}
+                                    <label class="text-danger small mb-0">Delete</label>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold small">Degree</label>
+                                    {{ edu_form.degree }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold small">Field of Study</label>
+                                    {{ edu_form.field_of_study }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold small">Institution</label>
+                                    {{ edu_form.institution }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold small">Start Year</label>
+                                    {{ edu_form.start_year }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold small">End Year</label>
+                                    {{ edu_form.end_year }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small">Honor / Award</label>
+                                    {{ edu_form.honor }}
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold small">Description</label>
+                                    {{ edu_form.description }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- ══ Contact & Social Links ════════════════════════════════════ -->
+                <div class="card shadow-sm rounded-3 mb-4 border-0 profile-section-card">
+                    <div class="card-header profile-section-header border-bottom py-3 px-4">
+                        <h5 class="mb-1 fw-bold">
+                            <i class="bi bi-link-45deg me-2"></i>Contact & Social Links
+                        </h5>
+                        <p class="text-secondary small mb-0">Email, office location, LinkedIn, GitHub, and more.</p>
+                    </div>
+                    <div class="card-body p-4">
+
+                        <!-- Academic Links -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-12">
+                                <p class="fw-semibold small text-secondary mb-2">
+                                    <i class="bi bi-mortarboard me-1"></i> Academic Profiles
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">Google Scholar</label>
+                                {{ form.google_scholar }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">ResearchGate</label>
+                                {{ form.research_gate }}
+                            </div>
+                        </div>
+
+                        <hr class="my-3">
+
+                        <!-- Dynamic Contact Links (ContactLink model) -->
+                        <p class="fw-semibold small text-secondary mb-3">
+                            <i class="bi bi-link-45deg me-1"></i> Additional Links
+                        </p>
+                        {{ cl_formset.management_form }}
+                        {% for cl_form in cl_formset %}
+                        {% for hidden in cl_form.hidden_fields %}{{ hidden }}{% endfor %}
+                        <div
+                            class="p-3 rounded-3 mb-3 {% if cl_form.instance.pk %}bg-light{% else %}bg-white border{% endif %}">
+                            {% if cl_form.instance.pk %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-semibold small">
+                                    <i class="bi {{ cl_form.instance.icon_class }} me-1"></i>
+                                    {{ cl_form.instance.label }}
+                                </span>
+                                <div class="d-flex align-items-center gap-2">
+                                    {{ cl_form.DELETE }}
+                                    <label class="text-danger small mb-0">Delete</label>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="row g-2">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold small">Type</label>
+                                    {{ cl_form.link_type }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold small">Label</label>
+                                    {{ cl_form.label }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold small">Display Value</label>
+                                    {{ cl_form.value }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold small">URL</label>
+                                    {{ cl_form.url }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if form.errors or pub_formset.errors or teach_formset.errors or edu_formset.errors or cl_formset.errors %} <div class="alert alert-danger small">Please fix the errors above.</div>{% endif %}
+
+                <div class="publication-actions">
+                    <a href="{% url 'dashboard:main_dashboard' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary-custom px-4">
+                        <i class="bi bi-check-lg me-1"></i> Save Changes
+                    </button>
+                </div>
+
+            </form>
+        </div>
     </div>
-
-    <!-- ══ Research Interests ════════════════════════════════════════ -->
-    <div class="card shadow-sm rounded-3 mb-4 border-0">
-        <div class="card-header bg-white border-bottom py-3 px-4">
-            <h5 class="mb-1 fw-bold">Research Interests</h5>
-            <p class="text-secondary small mb-0">Describe the topics that define your expertise.</p>
-        </div>
-        <div class="card-body p-4">
-            <div class="tag-input-box" id="tag-box"></div>
-            <input type="hidden" name="research_interests" id="research-interests-val"
-                value="{{ profile.research_interests }}">
-            <p class="text-secondary small mt-2">Press Enter or comma to save each keyword.</p>
-        </div>
-    </div>
-
-    <!-- ══ Publications ══════════════════════════════════════════════ -->
-    <div class="card shadow-sm rounded-3 mb-4 border-0">
-        <div class="card-header bg-white border-bottom py-3 px-4">
-            <h5 class="mb-1 fw-bold">Publications</h5>
-            <p class="text-secondary small mb-0">Edit your saved publications or add a new one.</p>
-        </div>
-        <div class="card-body p-4">
-            {{ pub_formset.management_form }}
-            {% for pub_form in pub_formset %}
-            {% for hidden in pub_form.hidden_fields %}{{ hidden }}{% endfor %}
-            <div class="p-3 rounded-3 mb-3 {% if pub_form.instance.pk %}bg-light{% else %}bg-white border{% endif %}">
-                {% if pub_form.instance.pk %}
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="fw-semibold">{{ pub_form.instance.title|truncatechars:50 }}</span>
-                    <div class="d-flex align-items-center gap-2">
-                        {{ pub_form.DELETE }}
-                        <label class="text-danger small mb-0">Delete</label>
-                    </div>
-                </div>
-                {% endif %}
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold small">Title</label>
-                        {{ pub_form.title }}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold small">Publication Date</label>
-                        {{ pub_form.publication_date }}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold small">PDF Link</label>
-                        {{ pub_form.pdf_link }}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold small">GitHub Link</label>
-                        {{ pub_form.github_link }}
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label fw-semibold small">Description</label>
-                        {{ pub_form.description }}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- ══ Teaching ══════════════════════════════════════════════════ -->
-    <div class="card shadow-sm rounded-3 mb-4 border-0">
-        <div class="card-header bg-white border-bottom py-3 px-4">
-            <h5 class="mb-1 fw-bold">Teaching</h5>
-            <p class="text-secondary small mb-0">Edit saved courses or add a new one.</p>
-        </div>
-        <div class="card-body p-4">
-            {{ teach_formset.management_form }}
-            {% for teach_form in teach_formset %}
-            {% for hidden in teach_form.hidden_fields %}{{ hidden }}{% endfor %}
-            <div class="p-3 rounded-3 mb-3 {% if teach_form.instance.pk %}bg-light{% else %}bg-white border{% endif %}">
-                {% if teach_form.instance.pk %}
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="fw-semibold">{{ teach_form.instance.course_name }}</span>
-                    <div class="d-flex align-items-center gap-2">
-                        {{ teach_form.DELETE }}
-                        <label class="text-danger small mb-0">Delete</label>
-                    </div>
-                </div>
-                {% endif %}
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold small">Course Name</label>
-                        {{ teach_form.course_name }}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold small">Semester</label>
-                        {{ teach_form.semester }}
-                    </div>
-                    <div class="col-md-8">
-                        <label class="form-label fw-semibold small">Description</label>
-                        {{ teach_form.description }}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold small">Syllabus Link</label>
-                        {{ teach_form.syllabus_link }}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- ══ Education ═════════════════════════════════════════════════ -->
-    <div class="card shadow-sm rounded-3 mb-4 border-0">
-        <div class="card-header bg-white border-bottom py-3 px-4">
-            <h5 class="mb-1 fw-bold">Education</h5>
-            <p class="text-secondary small mb-0">Add your academic degrees and qualifications.</p>
-        </div>
-        <div class="card-body p-4">
-            {{ edu_formset.management_form }}
-            {% for edu_form in edu_formset %}
-            {% for hidden in edu_form.hidden_fields %}{{ hidden }}{% endfor %}
-            <div class="p-3 rounded-3 mb-3 {% if edu_form.instance.pk %}bg-light{% else %}bg-white border{% endif %}">
-                {% if edu_form.instance.pk %}
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="fw-semibold">
-                        {{ edu_form.instance.degree }} — {{ edu_form.instance.institution }}
-                        {% if edu_form.instance.honor %}
-                        <span class="badge bg-warning text-dark ms-2" style="font-size:.7rem">
-                            {{ edu_form.instance.honor }}
-                        </span>
-                        {% endif %}
-                    </span>
-                    <div class="d-flex align-items-center gap-2">
-                        {{ edu_form.DELETE }}
-                        <label class="text-danger small mb-0">Delete</label>
-                    </div>
-                </div>
-                {% endif %}
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold small">Degree</label>
-                        {{ edu_form.degree }}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold small">Field of Study</label>
-                        {{ edu_form.field_of_study }}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold small">Institution</label>
-                        {{ edu_form.institution }}
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-semibold small">Start Year</label>
-                        {{ edu_form.start_year }}
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-semibold small">End Year</label>
-                        {{ edu_form.end_year }}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold small">Honor / Award</label>
-                        {{ edu_form.honor }}
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label fw-semibold small">Description</label>
-                        {{ edu_form.description }}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- ══ Contact & Social Links ════════════════════════════════════ -->
-    <div class="card shadow-sm rounded-3 mb-4 border-0">
-        <div class="card-header bg-white border-bottom py-3 px-4">
-            <h5 class="mb-1 fw-bold">Contact & Social Links</h5>
-            <p class="text-secondary small mb-0">Email, office location, LinkedIn, GitHub, and more.</p>
-        </div>
-        <div class="card-body p-4">
-
-            <!-- Academic Links -->
-            <div class="row g-3 mb-4">
-                <div class="col-12">
-                    <p class="fw-semibold small text-secondary mb-2">
-                        <i class="bi bi-mortarboard me-1"></i> Academic Profiles
-                    </p>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold small">Google Scholar</label>
-                    {{ form.google_scholar }}
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold small">ResearchGate</label>
-                    {{ form.research_gate }}
-                </div>
-            </div>
-
-            <hr class="my-3">
-
-            <!-- Dynamic Contact Links (ContactLink model) -->
-            <p class="fw-semibold small text-secondary mb-3">
-                <i class="bi bi-link-45deg me-1"></i> Additional Links
-            </p>
-            {{ cl_formset.management_form }}
-            {% for cl_form in cl_formset %}
-            {% for hidden in cl_form.hidden_fields %}{{ hidden }}{% endfor %}
-            <div class="p-3 rounded-3 mb-3 {% if cl_form.instance.pk %}bg-light{% else %}bg-white border{% endif %}">
-                {% if cl_form.instance.pk %}
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="fw-semibold small">
-                        <i class="bi {{ cl_form.instance.icon_class }} me-1"></i>
-                        {{ cl_form.instance.label }}
-                    </span>
-                    <div class="d-flex align-items-center gap-2">
-                        {{ cl_form.DELETE }}
-                        <label class="text-danger small mb-0">Delete</label>
-                    </div>
-                </div>
-                {% endif %}
-                <div class="row g-2">
-                    <div class="col-md-3">
-                        <label class="form-label fw-semibold small">Type</label>
-                        {{ cl_form.link_type }}
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-semibold small">Label</label>
-                        {{ cl_form.label }}
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-semibold small">Display Value</label>
-                        {{ cl_form.value }}
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-semibold small">URL</label>
-                        {{ cl_form.url }}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    {% if form.errors or pub_formset.errors or teach_formset.errors or edu_formset.errors or cl_formset.errors %}
-    <div class="alert alert-danger small">Please fix the errors above.</div>
-    {% endif %}
-
-    <div class="d-flex justify-content-end gap-3 mt-4">
-        <a href="{% url 'dashboard:main_dashboard' %}" class="btn btn-outline-secondary px-4">Cancel</a>
-        <button type="submit" class="btn btn-primary-custom px-4">
-            <i class="bi bi-check-lg me-1"></i> Save Changes
-        </button>
-    </div>
-
-</form>
 </div>
 {% endblock dashboard_content %}

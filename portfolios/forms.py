@@ -51,10 +51,14 @@ class ProfileForm(forms.ModelForm):
             'bio': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 4,
-                'placeholder': 'Write a short academic biography...'
+                'placeholder': 'Write a short academic biography...',
             }),
-           'profile_image': forms.FileInput(attrs={'class': 'form-control'}),
-           
+            'profile_image': forms.FileInput(attrs={
+                'class': 'form-control d-none',
+                'id': 'profile-image-input',
+                'accept': 'image/*'
+            }),
+            
             'google_scholar': forms.URLInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'https://scholar.google.com/...',
@@ -75,7 +79,7 @@ class ProfileForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field_name in ['full_name', 'academic_title', 'institution', 'field_of_study', 'bio']:
+        for field_name in ['full_name', 'academic_title', 'institution', 'field_of_study']:
             if field_name in self.fields:
                 self.fields[field_name].required = True
 
@@ -99,9 +103,8 @@ class PublicationForm(forms.ModelForm):
         ]
         widgets = {
             'title': forms.TextInput(attrs={
-                'class': 'form-control pub-required',
+                'class': 'form-control',
                 'placeholder': 'Publication title',
-                'required': True,
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -122,6 +125,25 @@ class PublicationForm(forms.ModelForm):
             }),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make publication title optional so onboarding does not block
+        if 'title' in self.fields:
+            self.fields['title'].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        title = cleaned_data.get('title')
+        other_fields = [
+            cleaned_data.get('description'),
+            cleaned_data.get('pdf_link'),
+            cleaned_data.get('github_link'),
+            cleaned_data.get('publication_date'),
+        ]
+        if not title and any(value not in (None, '', []) for value in other_fields):
+            self.add_error('title', 'Please enter a publication title if you provide any publication details.')
+        return cleaned_data
+
 
 # ── 3. Teaching ──────────────────────────────────────────────────────────
 class TeachingForm(forms.ModelForm):
@@ -130,9 +152,8 @@ class TeachingForm(forms.ModelForm):
         fields = ['course_name', 'description', 'syllabus_link', 'semester']
         widgets = {
             'course_name': forms.TextInput(attrs={
-                'class': 'form-control teach-required',
+                'class': 'form-control',
                 'placeholder': 'e.g. Machine Learning 101',
-                'required': True,
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -148,6 +169,12 @@ class TeachingForm(forms.ModelForm):
                 'placeholder': 'e.g. Fall 2024'
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make teaching fields optional so onboarding does not block when none provided
+        for fname in self.fields:
+            self.fields[fname].required = False
 
 
 # ── 4. Media ─────────────────────────────────────────────────────────────
@@ -203,9 +230,32 @@ class EducationForm(forms.ModelForm):
         cleaned_data = super().clean()
         start = cleaned_data.get("start_year")
         end = cleaned_data.get("end_year")
+
+        # If one year is provided but the other is missing, assume a single-year entry
+        # (e.g., short certificate Year: 2026) and copy the provided year into the missing field.
+        if (start in (None, "") or start is None) and end not in (None, ""):
+            cleaned_data["start_year"] = end
+            start = cleaned_data.get("start_year")
+        if (end in (None, "") or end is None) and start not in (None, ""):
+            cleaned_data["end_year"] = start
+            end = cleaned_data.get("end_year")
+
+        has_any_details = any(
+            cleaned_data.get(field) not in (None, "", [])
+            for field in ["degree", "field_of_study", "institution", "description", "honor", "end_year"]
+        )
+        if has_any_details and not start:
+            self.add_error("start_year", "Please enter a start year if you provide any education details.")
+
         if end and start and end < start:
             self.add_error("end_year", "End year cannot be before start year.")
         return cleaned_data
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make education fields optional in the form so users can skip this step in the wizard
+        for fname in self.fields:
+            self.fields[fname].required = False
 
 
 
@@ -220,6 +270,11 @@ class ContactLinkForm(forms.ModelForm):
             'url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': "https://... (optional)"}),
             'link_type': forms.Select(attrs={'class': 'form-select'}),
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make contact link fields optional so users can skip adding any
+        for fname in self.fields:
+            self.fields[fname].required = False
 # ── FormSets ──────────────────────────────────────────────────────────────
 PublicationFormSet = inlineformset_factory(
     Profile, Publication,

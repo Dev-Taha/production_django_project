@@ -6,7 +6,8 @@
 {% block step1_active %}active{% endblock %}
 
 {% block button %}
-<a href="{% url 'portfolios:onboarding_two' %}" class="wizard-continue-btn disabled-btn mt-0 py-2 px-4 rounded-3" style="border-radius: 0.5rem !important; font-size: 1rem; font-weight: 600;" id="continue-btn">Next Step</a>
+<a href="{% url 'portfolios:onboarding_two' %}" class="wizard-continue-btn disabled-btn mt-0 py-2 px-4 rounded-3"
+    style="border-radius: 0.5rem !important; font-size: 1rem; font-weight: 600;" id="continue-btn">Next Step</a>
 {% endblock button %}
 
 {% block step_content %}
@@ -25,9 +26,22 @@
             <p class="wizard-card-desc">
                 AI reads your CV in seconds and auto-extracts your skills, publications, and background.
             </p>
-            <div class="wizard-card-dropzone">
+            <div class="wizard-card-dropzone" id="cv-dropzone">
                 <i class="bi bi-cloud-upload"></i>
                 <span>Drop PDF or Word here</span>
+                <input type="file" id="cv-file-input" accept=".pdf,.docx" class="d-none">
+            </div>
+            <input type="hidden" id="csrf-token-field" value="{{ csrf_token }}">
+            <div class="wizard-card-scanning d-none" id="cv-scanning">
+                <div class="scan-icon">
+                    <i class="bi bi-file-earmark-text"></i>
+                </div>
+                <div class="scan-bar">
+                    <div class="scan-progress"></div>
+                </div>
+                <div class="scan-message" id="cv-scan-message">Extracting your skills...</div>
+                <div class="scan-errors d-none" id="cv-scan-error"></div>
+                <button type="button" class="btn btn-link text-white d-none" id="cv-retry-btn">Try again</button>
             </div>
             <div class="wizard-card-tags">
                 <span class="wizard-tag">~30 seconds</span>

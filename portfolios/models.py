@@ -89,6 +89,7 @@ class Profile(models.Model):
     )
 
     research_interests = models.TextField(blank=True, default='')
+    onboarding_completed = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
