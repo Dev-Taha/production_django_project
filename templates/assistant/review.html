@@ -4,119 +4,132 @@
 {% block nav_assistant %}active{% endblock %}
 
 {% block dashboard_content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h4 class="mb-1">Portfolio review</h4>
-        <p class="text-secondary mb-0">AI analysis of your academic profile</p>
-    </div>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-stars me-1"></i>
-            {% if report %}Run new review{% else %}Run review{% endif %}
-        </button>
-    </form>
-</div>
-
-{% if not report %}
-<div class="card border-0 shadow-sm">
-    <div class="card-body text-center py-5 text-secondary">
-        <i class="bi bi-clipboard-data fs-1 d-block mb-2"></i>
-        <p class="fw-medium mb-1">No review yet</p>
-        <p class="mb-0">Run your first review to get a completeness score and improvement plan.</p>
-    </div>
-</div>
-{% else %}
-
-<div class="row g-4">
-    <div class="col-lg-5">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <div class="text-center">
-                    <svg width="150" height="150" viewBox="0 0 120 120">
-                        <circle cx="60" cy="60" r="50" fill="none" stroke="#e9ecef" stroke-width="10"/>
-                        <circle cx="60" cy="60" r="50" fill="none" stroke-width="10" stroke-linecap="round"
-                            stroke="{% if score >= 75 %}#198754{% elif score >= 55 %}#ffc107{% else %}#dc3545{% endif %}"
-                            stroke-dasharray="314.16" stroke-dashoffset="{{ dash_offset }}"
-                            transform="rotate(-90 60 60)"/>
-                        <text x="60" y="58" text-anchor="middle" font-size="26" font-weight="600">{{ score }}</text>
-                        <text x="60" y="76" text-anchor="middle" font-size="11" fill="#6c757d">/ 100 · {{ grade }}</text>
-                    </svg>
-                    <p class="text-secondary small mt-2 mb-0">Reviewed {{ report.created_at|date:"j M Y, H:i" }}</p>
-                </div>
-                <hr>
-                <p class="text-uppercase text-secondary small fw-medium mb-3">Score by section</p>
-                {% for s in sections %}
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between small mb-1">
-                        <span>{{ s.label }}</span>
-                        <span class="text-secondary">{{ s.points }}/{{ s.max }}</span>
+<div class="review-page-shell">
+    <div class="card publication-card border-0">
+        <div class="card-header publication-card-header py-4">
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="publication-icon-badge">
+                        <i class="bi bi-clipboard-data"></i>
                     </div>
-                    <div class="progress" style="height: 8px;">
-                        <div class="progress-bar" style="width: {{ s.pct }}%;"></div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-7">
-        {% if ai %}
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body">
-                <p class="text-uppercase text-secondary small fw-medium mb-2">Assistant summary</p>
-                <p>{{ ai.summary }}</p>
-                {% if ai.next_steps %}
-                <p class="text-uppercase text-secondary small fw-medium mb-2">Do these first</p>
-                <ol class="mb-0">{% for n in ai.next_steps %}<li>{{ n }}</li>{% endfor %}</ol>
-                {% endif %}
-            </div>
-        </div>
-        {% elif ai_error %}
-        <div class="alert alert-warning">
-            <i class="bi bi-exclamation-triangle me-1"></i>
-            AI summary unavailable ({{ ai_error }}). Showing rule-based analysis below.
-        </div>
-        {% endif %}
-
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body">
-                <p class="text-uppercase text-secondary small fw-medium mb-2">Findings</p>
-                {% for f in findings %}
-                <div class="d-flex gap-2 py-2 {% if not forloop.last %}border-bottom{% endif %}">
-                    <i class="bi bi-circle-fill mt-1 small
-                        {% if f.status == 'ok' %}text-success
-                        {% elif f.status == 'weak' %}text-warning
-                        {% elif f.status == 'inconsistent' %}text-primary
-                        {% else %}text-danger{% endif %}"></i>
                     <div>
-                        <div class="small text-secondary">{{ f.label }}</div>
-                        {{ f.message }}
+                        <h4 class="mb-1">Portfolio review</h4>
+                        <p class="publication-card-subtitle mb-0">AI analysis of your academic profile</p>
                     </div>
                 </div>
-                {% endfor %}
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary-custom">
+                        <i class="bi bi-stars me-1"></i>
+                        {% if report %}Run new review{% else %}Run review{% endif %}
+                    </button>
+                </form>
             </div>
         </div>
+        <div class="card-body p-4 p-lg-5">
+            {% if not report %}
+            <div class="review-empty-card">
+                <i class="bi bi-clipboard-data fs-1 d-block mb-2"></i>
+                <p class="fw-medium mb-1">No review yet</p>
+                <p class="mb-0">Run your first review to get a completeness score and improvement plan.</p>
+            </div>
+            {% else %}
 
-        {% if ai and ai.recommendations %}
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <p class="text-uppercase text-secondary small fw-medium mb-2">Recommendations</p>
-                {% for r in ai.recommendations %}
-                <div class="d-flex gap-3 py-2 {% if not forloop.last %}border-bottom{% endif %}">
-                    <span class="badge text-bg-primary rounded-pill">{{ r.priority }}</span>
-                    <div>
-                        <div class="small text-secondary">{{ r.section }}</div>
-                        {{ r.action }}
-                        {% if r.example %}<div class="small text-secondary fst-italic">Example: {{ r.example }}</div>{% endif %}
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <div class="review-score-card h-100">
+                        <div class="text-center">
+                            <svg width="150" height="150" viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="50" fill="none" stroke="#e9ecef" stroke-width="10" />
+                                <circle cx="60" cy="60" r="50" fill="none" stroke-width="10" stroke-linecap="round"
+                                    stroke="{% if score >= 75 %}#198754{% elif score >= 55 %}#ffc107{% else %}#dc3545{% endif %}"
+                                    stroke-dasharray="314.16" stroke-dashoffset="{{ dash_offset }}"
+                                    transform="rotate(-90 60 60)" />
+                                <text x="60" y="58" text-anchor="middle" font-size="26" font-weight="600">{{ score
+                                    }}</text>
+                                <text x="60" y="76" text-anchor="middle" font-size="11" fill="#6c757d">/ 100 · {{ grade
+                                    }}</text>
+                            </svg>
+                            <p class="review-meta small mt-2 mb-0">Reviewed {{ report.created_at|date:"j M Y, H:i" }}
+                            </p>
+                        </div>
+                        <hr>
+                        <p class="review-section-label mb-3">Score by section</p>
+                        {% for s in sections %}
+                        <div class="review-section-row">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span>{{ s.label }}</span>
+                                <span class="review-meta">{{ s.points }}/{{ s.max }}</span>
+                            </div>
+                            <div class="progress review-progress">
+                                <div class="progress-bar" style="width: {{ s.pct }}%;"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
-                {% endfor %}
+
+                <div class="col-lg-7">
+                    {% if ai %}
+                    <div class="review-panel-card mb-4">
+                        <div class="card-body">
+                            <p class="review-section-label mb-2">Assistant summary</p>
+                            <p class="review-body-text">{{ ai.summary }}</p>
+                            {% if ai.next_steps %}
+                            <p class="review-section-label mb-2">Do these first</p>
+                            <ol class="mb-0 review-body-text">{% for n in ai.next_steps %}<li>{{ n }}</li>{% endfor %}
+                            </ol>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% elif ai_error %}
+                    <div class="review-alert">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        AI summary unavailable ({{ ai_error }}). Showing rule-based analysis below.
+                    </div>
+                    {% endif %}
+
+                    <div class="review-panel-card mb-4">
+                        <div class="card-body">
+                            <p class="review-section-label mb-2">Findings</p>
+                            {% for f in findings %}
+                            <div class="review-finding-row {% if not forloop.last %}border-bottom{% endif %}">
+                                <i class="bi bi-circle-fill mt-1 small
+                                    {% if f.status == 'ok' %}text-success
+                                    {% elif f.status == 'weak' %}text-warning
+                                    {% elif f.status == 'inconsistent' %}text-primary
+                                    {% else %}text-danger{% endif %}"></i>
+                                <div>
+                                    <div class="small review-meta">{{ f.label }}</div>
+                                    <div class="review-body-text">{{ f.message }}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {% if ai and ai.recommendations %}
+                    <div class="review-panel-card">
+                        <div class="card-body">
+                            <p class="review-section-label mb-2">Recommendations</p>
+                            {% for r in ai.recommendations %}
+                            <div class="review-recommendation-row {% if not forloop.last %}border-bottom{% endif %}">
+                                <span class="badge review-priority-badge">{{ r.priority }}</span>
+                                <div>
+                                    <div class="small review-meta">{{ r.section }}</div>
+                                    <div class="review-body-text">{{ r.action }}</div>
+                                    {% if r.example %}<div class="small review-meta fst-italic">Example: {{ r.example }}
+                                    </div>{% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
 </div>
-{% endif %}
 {% endblock dashboard_content %}

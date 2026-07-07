@@ -276,6 +276,81 @@ h6 {
     padding-bottom: 1.25rem;
 }
 
+.review-page-shell {
+    padding-top: 0.75rem !important;
+    padding-bottom: 1.25rem;
+}
+
+.review-empty-card {
+    padding: 2.2rem;
+    border: 1px solid #F1EAFD;
+    border-radius: 14px;
+    background: #FCFBFF;
+    text-align: center;
+    color: #6B7280;
+}
+
+.review-score-card,
+.review-panel-card {
+    border: 1px solid #F1EAFD;
+    border-radius: 14px;
+    background: #FCFBFF;
+    padding: 1.1rem;
+}
+
+.review-section-label {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #2D1B69;
+}
+
+.review-meta {
+    color: #6B7280;
+}
+
+.review-progress {
+    height: 8px;
+    border-radius: 999px;
+    background-color: #EDE9FE;
+}
+
+.review-progress .progress-bar {
+    background: linear-gradient(90deg, #2D1B69 0%, #7C3AED 100%);
+}
+
+.review-section-row {
+    margin-bottom: 0.9rem;
+}
+
+.review-finding-row,
+.review-recommendation-row {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.8rem 0;
+}
+
+.review-priority-badge {
+    background: #2D1B69 !important;
+    color: #ffffff !important;
+    border-radius: 999px;
+    padding: 0.35rem 0.7rem;
+}
+
+.review-body-text {
+    color: #374151;
+}
+
+.review-alert {
+    background: #FFF7ED;
+    color: #9A2C00;
+    border: 1px solid #FED7AA;
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 1rem;
+}
+
 .course-page-shell .publication-section-title {
     display: flex;
     align-items: center;
