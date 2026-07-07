@@ -96,7 +96,17 @@ class Profile(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.full_name) or f"user-{self.user_id}"
+            base_name = self.full_name or self.user.get_username() if self.user_id else "user"
+            base_slug = slugify(base_name) or f"user-{self.user_id or 'new'}"
+            candidate_slug = base_slug
+            counter = 1
+
+            while Profile.objects.filter(slug=candidate_slug).exclude(pk=self.pk).exists():
+                candidate_slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            self.slug = candidate_slug
+
         super().save(*args, **kwargs)
 
     def __str__(self):

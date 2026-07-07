@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts.models import User
-from .models import Education
+from .models import Education, Profile
 from .views import resolve_preview_theme
 
 
@@ -12,6 +12,19 @@ class PortfolioPreviewTests(TestCase):
 
         self.assertEqual(theme.slug, "academic-light")
         self.assertEqual(theme.template_path, "themes/academic-light/index.html")
+
+
+class ProfileSlugTests(TestCase):
+    def test_duplicate_full_name_generates_unique_slug(self):
+        user_a = User.objects.create(first_name="Ahmad", last_name="Nazzal", email="ahmad@example.com")
+        user_b = User.objects.create(first_name="Ahmad", last_name="Nazzal", email="ahmad2@example.com")
+
+        profile_a = Profile.objects.create(user=user_a, full_name="Ahmad Nazzal")
+        profile_b = Profile.objects.create(user=user_b, full_name="Ahmad Nazzal")
+
+        self.assertNotEqual(profile_a.slug, profile_b.slug)
+        self.assertEqual(profile_a.slug, "ahmad-nazzal")
+        self.assertEqual(profile_b.slug, "ahmad-nazzal-1")
 
 
 class OnboardingTwoTemplateTests(TestCase):
