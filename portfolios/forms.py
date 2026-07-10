@@ -5,6 +5,23 @@ from .models import Profile, Publication, Teaching,ContactLink,Education
 
 # ── 1. Personal Info ─────────────────────────────────────────────────────
 class ProfileForm(forms.ModelForm):
+    email = forms.EmailField(
+        required=False,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'e.g. sarah.johnson@university.edu',
+            'autocomplete': 'email',
+        }),
+    )
+    phone_number = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'e.g. +1 555 123 4567',
+            'autocomplete': 'tel',
+        }),
+    )
+
     # profile_picture = forms.ImageField(
     #     required=False,
     #     widget=forms.FileInput(attrs={
@@ -82,6 +99,15 @@ class ProfileForm(forms.ModelForm):
         for field_name in ['full_name', 'academic_title', 'institution', 'field_of_study']:
             if field_name in self.fields:
                 self.fields[field_name].required = True
+
+        profile = kwargs.get('instance')
+        if profile is not None:
+            email_link = profile.contact_links.filter(link_type='email').first()
+            phone_link = profile.contact_links.filter(link_type='phone').first()
+            if email_link is not None:
+                self.initial['email'] = email_link.value
+            if phone_link is not None:
+                self.initial['phone_number'] = phone_link.value
 
     # def save(self, commit=True):
     #     profile = super().save(commit=False)

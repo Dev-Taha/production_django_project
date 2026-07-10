@@ -28,8 +28,9 @@ from services.ai_extraction import (
     extract_cv_data,
     save_extracted_data,
 )
-from .models import Profile, Publication, Teaching, Theme
+from .models import Profile, Publication, Teaching, Theme, ContactLink
 from django.contrib import messages
+from django.db.models import Max
 from .forms import ProfileForm, PublicationForm, TeachingForm, EducationFormSet, PublicationFormSet, TeachingFormSet
 
 
@@ -217,6 +218,35 @@ def onboarding_two(request):
 
         if forms_valid:
             profile_form.save()
+
+            email_value = profile_form.cleaned_data.get('email', '').strip()
+            phone_value = profile_form.cleaned_data.get('phone_number', '').strip()
+
+            def _upsert_contact_link(link_type, label, value):
+                existing_link = profile.contact_links.filter(link_type=link_type).first()
+                if not value:
+                    if existing_link:
+                        existing_link.delete()
+                    return
+
+                if existing_link:
+                    existing_link.value = value
+                    existing_link.label = label
+                    existing_link.save()
+                    return
+
+                max_order = profile.contact_links.aggregate(max_order=Max('order_index'))['max_order']
+                order_index = 0 if max_order is None else max_order + 1
+                ContactLink.objects.create(
+                    profile=profile,
+                    link_type=link_type,
+                    label=label,
+                    value=value,
+                    order_index=order_index,
+                )
+
+            _upsert_contact_link('email', 'Email', email_value)
+            _upsert_contact_link('phone', 'Phone', phone_value)
 
             # Save inline formsets or fall back to legacy array parsing
             if not pub_legacy:
