@@ -16,5 +16,4 @@ urlpatterns = [
     path('api/onboarding/cv-status/<str:task_id>/', portfolios_views.cv_status, name='cv_status'),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

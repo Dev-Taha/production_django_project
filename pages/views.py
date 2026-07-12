@@ -1,7 +1,13 @@
-from django.shortcuts import render, redirect
+import logging
+
+from django.shortcuts import redirect
 from django.views import generic
-from django.core.mail import send_mail
+from django.core.mail import send_mail, BadHeaderError
 from django.contrib import messages
+
+from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 
 class Landing(generic.TemplateView):
@@ -20,16 +26,25 @@ class Landing(generic.TemplateView):
         subject = f"New contact message from: {name}"
         full_message = f"Name: {name}\nEmail: {email}\n\nMessage:\n{message}"
 
+        if not settings.EMAIL_HOST_USER:
+            logger.warning('Contact form submitted but EMAIL_HOST_USER is not configured.')
+            messages.error(request, 'Email service is not configured. Please contact the administrator.')
+            return redirect('pages:landing')
+
         try:
             send_mail(
                 subject,
                 full_message,
-                email,
+                settings.DEFAULT_FROM_EMAIL,
                 ['smartweb801@gmail.com'],
                 fail_silently=False,
             )
             messages.success(request, 'Your message has been sent successfully!')
+        except BadHeaderError:
+            logger.exception('Invalid header in contact form submission.')
+            messages.error(request, 'Invalid form data. Please try again.')
         except Exception:
-            messages.error(request, 'An error occurred while sending the message. Please try again.')
+            logger.exception('Failed to send contact form email.')
+            messages.error(request, 'An error occurred while sending the message. Please try again later.')
 
         return redirect('pages:landing')
