@@ -4,15 +4,15 @@ Run: python manage.py seed_demo
 Creates a demo user 'ahmed' (password: demo1234) with a fully-populated
 portfolio. Re-run anytime — it's idempotent (wipes & re-seeds related rows).
 """
-from django.contrib.auth import get_user_model
+import bcrypt
+
 from django.core.management.base import BaseCommand
 
+from accounts.models import User as UserModel
 from portfolios.models import (
     Profile, Theme, ResearchInterest, Publication,
     Teaching, Education, ContactLink,
 )
-
-User = get_user_model()
 
 
 class Command(BaseCommand):
@@ -29,13 +29,16 @@ class Command(BaseCommand):
             return
 
         # User
-        user, created = User.objects.get_or_create(
-            username="ahmed",
-            defaults={"email": "ahmed.ali@example.edu", "first_name": "Ahmed", "last_name": "Ali"},
+        email = "ahmed.ali@example.edu"
+        user, created = UserModel.objects.get_or_create(
+            email=email,
+            defaults={
+                "first_name": "Ahmed",
+                "last_name": "Ali",
+                "password": bcrypt.hashpw("demo1234".encode(), bcrypt.gensalt()).decode(),
+            },
         )
         if created:
-            user.set_password("demo1234")
-            user.save()
             self.stdout.write(self.style.SUCCESS("Created user 'ahmed' (password: demo1234)"))
 
         # Profile
@@ -122,22 +125,22 @@ class Command(BaseCommand):
         Teaching.objects.bulk_create([
             Teaching(profile=profile, order_index=0,
                 course_name="Introduction to Machine Learning",
-                teachingscol="Fall 2025",
+                semester="Fall 2025",
                 description="Undergraduate introduction to supervised learning, optimization, and representation learning.",
                 syllabus_link="https://example.com/cs447"),
             Teaching(profile=profile, order_index=1,
                 course_name="Advanced Natural Language Processing",
-                teachingscol="Spring 2025",
+                semester="Spring 2025",
                 description="Graduate seminar on large language models, transformers, and responsible AI.",
                 syllabus_link="https://example.com/cs621"),
             Teaching(profile=profile, order_index=2,
                 course_name="Seminar: Interpretability in Modern Machine Learning",
-                teachingscol="Spring 2025",
+                semester="Spring 2025",
                 description="Student-led presentations exploring mechanistic interpretability techniques.",
                 syllabus_link="https://example.com/cs498"),
             Teaching(profile=profile, order_index=3,
                 course_name="Programming for Scientists",
-                teachingscol="Fall 2024",
+                semester="Fall 2024",
                 description="Hands-on Python programming for scientific research and data analysis.",
             ),
         ])

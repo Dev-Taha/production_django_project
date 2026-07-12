@@ -53,7 +53,7 @@ class PublicationInline(admin.StackedInline):
 class TeachingInline(admin.TabularInline):
     model = Teaching
     extra = 0
-    fields = ("order_index", "course_name", "teachingscol", "description", "syllabus_link")
+    fields = ("order_index", "course_name", "semester", "description", "syllabus_link")
 
 
 class ContactLinkInline(admin.TabularInline):

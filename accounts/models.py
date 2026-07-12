@@ -21,6 +21,9 @@ class User(models.Model):
     def is_google_user(self):
         return self.google_id is not None
 
+    def get_username(self):
+        return self.email or ''
+
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
     

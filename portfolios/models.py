@@ -7,6 +7,7 @@ this DB only stores data + a pointer (template_path) to the right theme folder.
 import re
 
 from django.db import models
+from django.utils import timezone
 from django.utils.text import slugify
 from accounts.models import User
 
@@ -170,6 +171,13 @@ class Teaching(models.Model):
     description = models.TextField(blank=True)
     syllabus_link = models.URLField(blank=True, null=True)
     semester = models.CharField(max_length=45, blank=True)
+    order_index = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["order_index"]
+
     def __str__(self):
         return self.course_name
 
