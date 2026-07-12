@@ -34,6 +34,7 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 if DEBUG:
     ALLOWED_HOSTS = ['localhost',
                      "production-django-project.onrender.com",
+                     
  '127.0.0.1',
  'testserver'
  ]
