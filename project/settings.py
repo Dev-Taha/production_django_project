@@ -12,42 +12,28 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from dotenv import load_dotenv
 import os
 from pathlib import Path
-from dotenv import load_dotenv
+
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load .env BEFORE using os.getenv()
 load_dotenv(BASE_DIR / '.env')
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# Must be set via environment variable (loaded from .env in development)
-SECRET_KEY = os.getenv(
-    'SECRET_KEY',
-    'django-insecure-changeme'  # Placeholder - will fail if not set in production
-)
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-changeme')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Set DEBUG=False in production environment to enable ALLOWED_HOSTS validation
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-# ALLOWED_HOSTS configuration:
-#  - Development (DEBUG=True): Automatically includes localhost, 127.0.0.1, testserver
-#  - Production (DEBUG=False): Must be set via ALLOWED_HOSTS environment variable
-#    Format: comma-separated list of hostnames (no spaces, no protocol prefix)
-#    Example: ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com,api.yourdomain.com
+# ALLOWED_HOSTS configuration
 if DEBUG:
-    # Development: permissive for local testing
     ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
 else:
-    # Production: strict - must come from environment variable
-    # This will fail loudly if ALLOWED_HOSTS is not set, preventing accidental misconfiguration
     allowed_hosts_str = os.getenv('ALLOWED_HOSTS', '')
     if not allowed_hosts_str:
         raise ValueError(
@@ -56,6 +42,21 @@ else:
             'Example: yourdomain.com,www.yourdomain.com'
         )
     ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',')]
+
+# CSRF configuration
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if os.getenv('CSRF_TRUSTED_ORIGINS') else []
+
+# Security headers (only enforced in production behind Render's proxy)
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
 
 
 # Application definition
@@ -67,7 +68,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'pages',
+    'pages',
     'accounts',
     'dashboard',
     'portfolios',
@@ -76,6 +77,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -108,16 +110,28 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'smartweb_db',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+DATABASE_URL = os.getenv('DATABASE_URL')
+
+if DATABASE_URL:
+    # Production: Render PostgreSQL via DATABASE_URL
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    # Development: SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+# Custom user model
+AUTH_USER_MODEL = 'accounts.User'
 
 
 # Password validation
@@ -157,10 +171,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+
+# WhiteNoise static file storage (compression and caching)
+STORAGES = {
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

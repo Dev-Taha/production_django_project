@@ -66,7 +66,7 @@ class ContactLinkInline(admin.TabularInline):
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ("full_name", "academic_title", "institution", "theme", "is_published", "view_link")
     list_filter = ("is_published", "theme")
-    search_fields = ("full_name", "user__email", "user__username", "institution")
+    search_fields = ("full_name", "user__email", "institution")
     prepopulated_fields = {"slug": ("full_name",)}
 
     fieldsets = (
