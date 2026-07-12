@@ -32,21 +32,16 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 # ALLOWED_HOSTS configuration
 if DEBUG:
-    ALLOWED_HOSTS = ['localhost',
-                     "production-django-project.onrender.com",
-                     
- '127.0.0.1',
- 'testserver'
- ]
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
 else:
     allowed_hosts_str = os.getenv('ALLOWED_HOSTS', '')
     if not allowed_hosts_str:
         raise ValueError(
             'ALLOWED_HOSTS environment variable must be set in production (DEBUG=False). '
             'Format: comma-separated hostnames (no spaces or protocol). '
-            'Example: yourdomain.com,www.yourdomain.com'
+            'Example: production-django-project.onrender.com,yourdomain.com'
         )
-    ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',')]
+    ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.strip()]
 
 # CSRF configuration
 CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if os.getenv('CSRF_TRUSTED_ORIGINS') else []
