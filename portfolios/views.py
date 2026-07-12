@@ -393,6 +393,9 @@ def onboarding_three(request):
 
 def portfolio_detail(request, slug):
     profile = get_object_or_404(Profile, slug=slug, is_published=True)
+    theme = profile.theme
+    if not theme:
+        raise Http404('No theme assigned to this profile.')
     publications = Publication.objects.filter(profile=profile)
     # Normalize research interests: prefer ResearchInterest entries, fall back to
     # legacy `profile.research_interests` text (one per line).
@@ -407,7 +410,8 @@ def portfolio_detail(request, slug):
         from types import SimpleNamespace
         research_items = [SimpleNamespace(title=part, description='', tag_list=[]) for part in parts]
 
-    return render(request, 'portfolios/portfolio_detail.html', {
+    return render(request, theme.template_path, {
+        'theme': theme,
         'profile': profile,
         'publications': profile.publications.all(),
         'teachings': profile.teachings.all(),

@@ -172,6 +172,23 @@ def set_theme_view(request):
     profile.save()
 
     return redirect('dashboard:templates_dashboard')
+
+
+def toggle_visibility(request):
+    if 'user_id' not in request.session:
+        return redirect('accounts:login')
+    if request.method != 'POST':
+        return redirect('dashboard:main_dashboard')
+
+    profile = get_profile(get_current_user(request))
+    profile.is_published = not profile.is_published
+    profile.save()
+
+    if profile.is_published:
+        messages.success(request, 'Your portfolio is now published and publicly visible!')
+    else:
+        messages.info(request, 'Your portfolio is now private.')
+    return redirect('dashboard:main_dashboard')
     # profile = get_profile(user)
 
     # slug = request.POST.get('theme_slug')

@@ -22,6 +22,39 @@
             class="btn btn-primary-custom d-flex align-items-center gap-2 px-4 py-2">
             <i class="bi bi-plus-circle"></i> Add Course
         </a>
+
+        {% if profile.slug %}
+            {% url 'portfolios:detail' slug=profile.slug as portfolio_url %}
+            <button onclick="copyPortfolioLink('{{ request.scheme }}://{{ request.get_host }}{{ portfolio_url }}', this)"
+                class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2"
+                {% if not profile.is_published %}
+                disabled
+                data-bs-toggle="tooltip" data-bs-placement="bottom"
+                title="Publish your profile first"
+                {% endif %}>
+                <i class="bi bi-link-45deg"></i> Copy Portfolio Link
+            </button>
+
+            <form method="post" action="{% url 'dashboard:toggle_visibility' %}" class="d-flex align-items-center">
+                {% csrf_token %}
+                <div class="form-check form-switch mb-0 d-flex align-items-center gap-2"
+                     data-bs-toggle="tooltip" data-bs-placement="bottom"
+                     title="{% if profile.is_published %}Unpublish your portfolio{% else %}Publish your portfolio publicly{% endif %}">
+                    <input class="form-check-input" type="checkbox" role="switch"
+                           id="publishToggle"
+                           {% if profile.is_published %}checked{% endif %}
+                           onchange="this.form.submit()"
+                           style="cursor: pointer;">
+                    <label class="form-check-label text-nowrap small text-secondary" for="publishToggle">
+                        {% if profile.is_published %}
+                            <i class="bi bi-globe2 text-success"></i> Published
+                        {% else %}
+                            <i class="bi bi-lock text-muted"></i> Draft
+                        {% endif %}
+                    </label>
+                </div>
+            </form>
+        {% endif %}
     </div>
 </div>
 
