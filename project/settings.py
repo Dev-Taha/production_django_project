@@ -182,7 +182,7 @@ STATICFILES_DIRS = [
 # WhiteNoise static file storage (compression and caching)
 STORAGES = {
     'default': {
-        'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage',
+        'BACKEND': 'project.storage.SmartCloudinaryStorage',
     },
     'staticfiles': {
         'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
