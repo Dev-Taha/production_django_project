@@ -503,6 +503,9 @@ def download_cv(request, slug):
     if not profile.cv_file:
         raise Http404('CV not found.')
     file_path = profile.cv_file.path
+    if not os.path.exists(file_path):
+        logger.warning('CV file missing on disk: %s', file_path)
+        raise Http404('CV file not found.')
     content_type, _ = mimetypes.guess_type(file_path)
     if not content_type:
         content_type = 'application/octet-stream'
