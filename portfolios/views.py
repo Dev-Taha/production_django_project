@@ -16,10 +16,8 @@ from types import SimpleNamespace
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db import OperationalError
-import mimetypes
-import os
 
-from django.http import FileResponse, JsonResponse, Http404
+from django.http import JsonResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -502,14 +500,4 @@ def download_cv(request, slug):
         raise Http404('CV not found.')
     if not profile.cv_file:
         raise Http404('CV not found.')
-    file_path = profile.cv_file.path
-    if not os.path.exists(file_path):
-        logger.warning('CV file missing on disk: %s', file_path)
-        raise Http404('CV file not found.')
-    content_type, _ = mimetypes.guess_type(file_path)
-    if not content_type:
-        content_type = 'application/octet-stream'
-    response = FileResponse(open(file_path, 'rb'), content_type=content_type)
-    filename = os.path.basename(file_path)
-    response['Content-Disposition'] = f'inline; filename="{filename}"'
-    return response
+    return redirect(profile.cv_file.url)

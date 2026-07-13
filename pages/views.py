@@ -1,7 +1,7 @@
 import logging
 
-from django.shortcuts import redirect
-from django.views import generic
+from django.shortcuts import redirect, render
+from django.views import View
 from django.core.mail import send_mail, BadHeaderError
 from django.contrib import messages
 
@@ -10,8 +10,11 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
-class Landing(generic.TemplateView):
+class Landing(View):
     template_name = 'pages/landing.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
 
     def post(self, request, *args, **kwargs):
         """Handle the contact form submission on the landing page."""
